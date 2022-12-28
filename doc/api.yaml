@@ -1,0 +1,611 @@
+openapi: 3.0.0
+info:
+  title: WASAPhoto
+  description: |-
+    API specification for the WASA Project, which will be
+    an Instagram like social network.
+  version: "1.2.0"
+
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: "User"
+    description: Endpoints for managing users
+  - name: "Media"
+    description: Endpoint for managing posts and photos
+  - name: "Followers"
+    description: Endpoint for managing followers
+  - name: "Bans"
+    description: Endpoint for managing banned users
+  - name: "Likes"
+    description: Endpoint for managing likes users
+  - name: "Comments"
+    description: Endpoint for managing comments
+  - name: "Stream"
+    description: Endpoint to get the user's personalized stream
+  - name: "Login"
+    description: Endpoint to manage the login phase
+
+paths:
+  /users/{user_id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags: ["User"]
+      summary: Retrive the user profile
+      description: |-
+        Retrive the user profile.
+        If the user doesn't exist return 404 not found.
+      operationId: getUserProfile
+      parameters:
+        - {$ref: "#/components/parameters/user_id"}
+      responses:
+        '200':
+          description: The user's profile metadata
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/profile"  }
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '404': {$ref: "#/components/responses/NotFound"}
+        '500': {$ref: "#/components/responses/InternalServerError"} 
+  
+  /users/{user_id}/username:
+    put:
+      security:
+        - bearerAuth: []
+      tags: ["User"]
+      summary: Updates the user's username given in the body
+      description: |-
+        Used to change the username into the one given 
+        in the request body
+      operationId: setMyUserName
+      parameters:
+        - {$ref: "#/components/parameters/user_id"}
+      requestBody:
+        description: The new username
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/username"
+        required: true
+      responses:
+        '204':
+          description: Username updated succesfully 
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '500': {$ref: "#/components/responses/InternalServerError"}
+          
+          
+  /result:
+    get:
+      security:
+        - bearerAuth: []
+      tags: ["User"]
+      summary: Returns a list of the results of the given query
+      description: |- 
+        Used to get a list of usernames, for the given query
+      operationId: searchUser
+      parameters:
+        - name: username
+          in: query
+          description: The username to fetch
+          schema:
+            type: string
+            example: "abcd1234"
+            pattern: "^[a-zA-Z1-9]*$"
+            minLength: 3
+            maxLength: 16
+          required: true
+      responses:
+        '200':
+          description: The list of fetched username profiles
+          content: 
+            application/json:
+              schema: 
+                description: The list of profiles
+                type: array
+                items: {$ref: "#/components/schemas/profile"}
+                minItems: 0
+                maxItems: 20
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '500': {$ref: "#/components/responses/InternalServerError"}   
+        
+  #the user id is taken from the auth`s header
+  /media/:
+    post:
+      security:
+        - bearerAuth: []
+      tags: ["Media"]
+      summary: This Api helps the user to upload a new photo on his profile
+      description: |-
+        uploads a new Media on the {userId}'s profile. Generate an ID for it 
+        and return it.
+      operationId: uploadPhoto
+      requestBody:
+        description: The image to upload
+        content:
+            image/png: 
+              schema: {$ref: "#/components/schemas/photo"}
+        required: true
+      responses:
+        '201':
+          description: new Media uploaded succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/id"
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '500': {$ref: "#/components/responses/InternalServerError"} 
+  /media/{post_id}/info/:
+    get:
+      security:
+        - bearerAuth: []
+      tags: ["Media"]
+      summary: returns the photo metadata
+      description: |-
+        returns the photo metadata
+      operationId: getPhotoMetadata
+      parameters:
+        - $ref: "#/components/parameters/post_id"
+      responses:
+        '200':
+            description: "The photo's metadata such as : number of likes, comments and id"
+            content: 
+              application/json:
+                schema: {$ref: "#/components/schemas/photo_metadata"}
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '404': {$ref: "#/components/responses/NotFound"}
+        '500': {$ref: "#/components/responses/InternalServerError"}   
+  /media/{post_id}/:
+    parameters:
+      - $ref: "#/components/parameters/post_id"
+    get:
+      security:
+        - bearerAuth: []
+      tags: ["Media"]
+      summary: returns the photo 
+      description: |-
+        returns the actual photo attached to the post
+      operationId: getPhoto
+      responses:
+        '200':
+            description: The image itself as png
+            content: 
+              image/png:
+                schema: {$ref: "#/components/schemas/photo"}
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '404': {$ref: "#/components/responses/NotFound"}
+        '500': {$ref: "#/components/responses/InternalServerError"} 
+    delete:
+      security:
+        - bearerAuth: []
+      tags: ["Media"]
+      summary: deletes a Photo and it`s related metadata
+      description: |-
+        deletes a photo and it`s related metadata
+      operationId: deletePhoto
+      responses:
+        '204':
+          description: Resource deleted successfully
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '404': {$ref: "#/components/responses/NotFound"}
+        '500': {$ref: "#/components/responses/InternalServerError"} 
+  /users/{user_id}/info:
+    get:
+      security:
+        - bearerAuth: []
+      tags: ["User"]
+      summary: This Api helps the user to get the users info
+      description: |-
+        gets the user info such as : followers list, followed list based 
+        on query parameters
+      operationId: getUserInfo
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      responses:
+        '200': 
+          description: The user followers and/or following profiles list
+          content:
+            application/json: 
+              schema: 
+                description: object containing followers and following usernames
+                type: object
+                properties:
+                  followers:
+                    type: array
+                    description: an array of profile`s objects rappresenting the followers usernames
+                    items:  {$ref: "#/components/schemas/profile"}
+                    minItems: 0
+                    maxItems: 100
+                  following:
+                    type: array
+                    description: an array of profile`s objects rappresenting following usernames
+                    items:  {$ref: "#/components/schemas/profile"}
+                    minItems: 0
+                    maxItems: 100
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '404': {$ref: "#/components/responses/NotFound"}
+        '500': {$ref: "#/components/responses/InternalServerError"}
+                
+            
+        
+  /users/{user_id}/follow/{followed_id}:
+    parameters:
+      - $ref: "#/components/parameters/user_id"
+      - name: followed_id
+        in: path
+        description: the user's id that need to be followed
+        schema:
+          $ref: "#/components/schemas/id"
+        required: true
+    put:
+      security:
+        - bearerAuth: []
+      tags: ["Followers"]
+      summary: lets the user follow another one
+      description: |-
+        use this Api in order to follow another user
+      operationId: followUser
+      responses:
+        '204':
+          description: Operation successfully handled
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '500': {$ref: "#/components/responses/InternalServerError"} 
+    delete:
+      security:
+        - bearerAuth: []
+      tags: ["Followers"]
+      summary: lets the user unfollow another one
+      description: |-
+        use this Api in order to unfollow another user
+      operationId: unfollowUser
+      responses:
+        '204':
+          description: Follow removed successfully
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '404': {$ref: "#/components/responses/NotFound"}
+        '500': {$ref: "#/components/responses/InternalServerError"}
+      
+  /users/{user_id}/banned/{ban_id}:
+    parameters:
+      - $ref: "#/components/parameters/user_id"
+      - name: ban_id
+        in: path
+        description: the user's id that need to be banned
+        schema:
+          $ref: "#/components/schemas/id"
+        required: true
+    put:
+      security:
+        - bearerAuth: []
+      tags: ["Bans"]
+      summary: Bans another user
+      description: |-
+        lets the user ban another user making himself invisible
+        to the banned one.
+      operationId: banUser
+      responses:
+        '204':
+          description: Operation successfully handled
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '500': {$ref: "#/components/responses/InternalServerError"}
+    delete:
+      tags: ["Bans"]
+      summary: Bans another user
+      description: |-
+        lets the user unban another user by removing him from the banned list.
+      operationId: unbanUser
+      responses:
+        '204':
+          description: Operation successfully handled
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '404': {$ref: "#/components/responses/NotFound"}
+        '500': {$ref: "#/components/responses/InternalServerError"}
+        
+  /{post_id}/likes/{user_id}:
+    parameters: 
+    - $ref: "#/components/parameters/post_id"
+    - $ref: "#/components/parameters/user_id"
+    put:
+      security:
+        - bearerAuth: []
+      tags: ["Likes"]
+      summary: adds a like to a post
+      description: |-
+        likes a photo 
+      operationId: likePhoto
+      responses:
+          '204':
+            description: Operation successfully handled
+          '400': {$ref: "#/components/responses/BadRequest"}
+          '403': {$ref: "#/components/responses/Forbidden"}
+          '500': {$ref: "#/components/responses/InternalServerError"}
+    delete:
+      tags: ["Likes"]
+      summary: removes a like to a post
+      description: |-
+        likes a photo 
+      operationId: unlikePhoto
+      responses:
+          '204':
+            description: Like removed successfully 
+          '400': {$ref: "#/components/responses/BadRequest"}
+          '403': {$ref: "#/components/responses/Forbidden"}
+          '404': {$ref: "#/components/responses/NotFound"}
+          '500': {$ref: "#/components/responses/InternalServerError"}  
+  /{post_id}/comments/comment/{user_id}:
+    post:
+      security:
+        - bearerAuth: []
+      tags: ["Comments"]
+      summary: adds a comment to a post
+      description: |-
+        Comment on a post using both post_id and user_id
+      operationId: commentPhoto
+      parameters: 
+      - $ref: "#/components/parameters/post_id"
+      - $ref: "#/components/parameters/user_id"
+      requestBody:
+        description: the comment itself
+        content: 
+          application/json:
+            schema:
+              description: object containing the comment`s content
+              type: object
+              properties:
+                comment_text:
+                  type: string
+                  description: "the comment's content"
+                  example: "cool pic!"
+                  minLength: 1
+                  maxLength: 200
+                  
+      responses:
+          '201':
+            description: Operation successfully handled
+          '400': {$ref: "#/components/responses/BadRequest"}
+          '403': {$ref: "#/components/responses/Forbidden"}
+          '500': {$ref: "#/components/responses/InternalServerError"}
+  /{post_id}/comments/delete/{comment_id}:
+    delete:
+      security:
+          - bearerAuth: []
+      tags: ["Comments"]
+      summary: removes a comment from a post
+      description: |-
+        removes a comment from a post
+      operationId: uncommentPhoto
+      parameters: 
+      - $ref: "#/components/parameters/post_id"
+      - name: comment_id
+        in: path
+        description: the comment's id that need to be removed
+        schema:
+          $ref: "#/components/schemas/id"
+        required: true
+      responses:
+          '204':
+            description: Operation successfully handled
+          '400': {$ref: "#/components/responses/BadRequest"}
+          '403': {$ref: "#/components/responses/Forbidden"}
+          '404': {$ref: "#/components/responses/NotFound"}
+          '500': {$ref: "#/components/responses/InternalServerError"}  
+        
+  /feed/{user_id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags: ["Stream"]
+      summary: returns a stream of photos metadata
+      description: |-
+        returns an array of up to 50 photo`s metadata objects
+        containing metadata usefull to display the photo with
+        likes and comments, the actual photo must be retriven 
+        by using the media/{photo_id} path
+      operationId: getMyStream
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      responses:
+        '200':
+          description: the actual array of post metadata
+          content:
+            application/json:
+              schema:
+                description: "an array containing the posts in reverse chrnological order"
+                type: array
+                items: {$ref: "#/components/schemas/photo_metadata"}
+                minItems: 0
+                maxItems: 50
+        '400': {$ref: "#/components/responses/BadRequest"}
+        '403': {$ref: "#/components/responses/Forbidden"}
+        '404': {$ref: "#/components/responses/NotFound"}
+        '500': {$ref: "#/components/responses/InternalServerError"} 
+      
+        
+          
+  /session:
+    post:
+      tags: ["Login"]
+      summary: Logs in the user
+      description: |-
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier is returned.
+      operationId: doLogin
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Maria
+                  pattern: "^[a-zA-Z1-9]*$"
+                  minLength: 3
+                  maxLength: 16
+        required: true
+      responses:
+        '201':
+          description: User log-in action successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:
+                    $ref: "#/components/schemas/id"
+components:
+  securitySchemes:
+    bearerAuth:            
+      type: http
+      scheme: bearer
+  parameters:
+    user_id:
+      description: the actual user id
+      schema: 
+        $ref: "#/components/schemas/id"
+      name: user_id
+      in: path
+      required: true
+    post_id:
+      description: the actual post id
+      schema: 
+        $ref: "#/components/schemas/id"
+      name: post_id
+      in: path
+      required: true
+      
+  responses:
+    BadRequest:
+      description: |-
+        The request was not compliant with the documentation
+        (eg. missing fields, etc).
+    Forbidden: 
+      description: |-
+        The client doesn't have the rights to this resource
+    NotFound:
+      description: |-
+        The requested resource could not be found but may be available 
+        in the future.
+    
+    InternalServerError:
+      description: |-
+        The server encountered an internal error.
+        Further info in server logs.
+  schemas:
+    id:
+      description: Id used to identificate a resource
+      type: integer
+      example: 4632
+      minimum: 1
+      maximum: 9999999
+    username:
+      description: The username picked in the login phase
+      type: string
+      example: Maria
+      pattern: "^[a-zA-Z1-9]*$"
+      minLength: 3
+      maxLength: 16
+    comment:
+      description: "object representation of a comment"
+      type: object
+      properties:
+        comment_id: 
+          {$ref: "#/components/schemas/id"}
+        owner_id:
+          {$ref: "#/components/schemas/id"}
+        owner_username:
+          {$ref: "#/components/schemas/username"}
+        comment_text:
+          type: string
+          description: The content of the comment
+          example: "some comment"
+          pattern: "[a-zA-Z1-9.,:<>?-_+='~#@;%\"$&*!]*"
+          minLength: 1
+          maxLength: 200
+        time_stamp:
+          type: string
+          description: the timestamp of the comment
+          format: date-time
+          example: "2018-03-20T09:12:28Z"
+    photo_metadata:
+      description: "object representation of a post"
+      type: object
+      properties:
+        id:
+          {$ref: "#/components/schemas/id"}
+        owner_id:
+          {$ref: "#/components/schemas/id"}
+        comments_count:
+          type: integer
+          description: the number of comments
+          example: 12
+          minimum: 0
+          maximum: 99999
+        comments:
+          type: array
+          description: the comments ids
+          items:  
+            $ref: "#/components/schemas/comment"
+          minItems: 0
+          maxItems: 99999
+        likes_count:
+          type: integer
+          description: the number of likes
+          example: 55
+          minimum: 0
+          maximum: 99999
+        likes:
+          type: array
+          description: the likes username id
+          items: 
+            $ref: '#/components/schemas/profile'
+          minItems: 0
+          maxItems: 99999
+        time_stamp:
+          type: string
+          description: the timestamp of the post
+          format: date-time
+          example: "2018-03-20T09:12:28Z"
+    photo:
+      type: string
+      format: byte 
+      description: the actual photo with base 64 encoding
+      minLength: 1
+      maxLength: 9999999 #10 MB could dimish later on
+    
+    profile:
+      description: "object representing a profile"
+      type: object
+      properties:
+        user_id:
+          $ref: "#/components/schemas/id"
+        username:
+          $ref: "#/components/schemas/username"
+        media_count:
+          description: The number of posts on the profile
+          type: integer
+          format: int64
+          example: 765
+        followers_Count:
+          description: The number of followers
+          type: integer
+          format: int64
+          example: 112
+        following_count:
+          description: The number of following
+          type: integer
+          format: int64
+          example: 112
+      

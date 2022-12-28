@@ -1,0 +1,5 @@
+curl -i -X GET http://localhost:3000/users/1 -H 'Authorization:1'
+
+curl -i http://localhost:3000/session -X POST -d '{"username":"nick"}'
+
+curl -i http://localhost:3000/users/1/username -X PUT -H 'Authorization:1' -d '{"username":"changed"}'

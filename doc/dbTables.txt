@@ -1,0 +1,6 @@
+user(id, username, followers_count, following_count, media_count)
+followers(id, follow_id)
+comments(id, owner_id, media_id, text, time_stamp)
+likes( id, media_id , user_id)
+bans(id, ban_id)
+media(id, owner_id ,likes_count, comments_count, png, time_stamp )
