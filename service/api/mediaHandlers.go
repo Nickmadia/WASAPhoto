@@ -45,7 +45,12 @@ func (rt *_router) getMedia(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	w.Header().Set("content-type", "image/png")
-	w.Write([]byte(*img))
+	_, err = w.Write([]byte(*img))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
 }
 
 func (rt *_router) getMediaMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -79,7 +84,12 @@ func (rt *_router) getMediaMetadata(w http.ResponseWriter, r *http.Request, ps h
 	}
 
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(*imgMetadata)
+	err = json.NewEncoder(w).Encode(*imgMetadata)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
 }
 
 func (rt *_router) postMedia(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -114,7 +124,12 @@ func (rt *_router) postMedia(w http.ResponseWriter, r *http.Request, ps httprout
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(imgId)
+	err = json.NewEncoder(w).Encode(imgId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
 }
 
 func (rt *_router) deleteMedia(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

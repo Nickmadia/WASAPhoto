@@ -127,7 +127,11 @@ func (rt *_router) addComment(w http.ResponseWriter, r *http.Request, ps httprou
 
 	var comment objects.CommentPlain
 
-	json.NewDecoder(r.Body).Decode(&comment)
+	err = json.NewDecoder(r.Body).Decode(&comment)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	if !isCommentValid(comment.Text) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -142,6 +146,9 @@ func (rt *_router) addComment(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	} else if errors.Is(err, database.ErrUserIsBanned) {
 		w.WriteHeader(http.StatusForbidden)
+		return
+	} else if errors.Is(err, database.ErrUserIsNotAuthenticated) {
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
