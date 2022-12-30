@@ -43,5 +43,10 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(postList)
+	err = json.NewEncoder(w).Encode(postList)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
 }

@@ -59,6 +59,9 @@ func (db *appdbimpl) FetchUsername(username string) ([]obj.ProfileDB, error) {
 	defer rows.Close()
 
 	for rows.Next() {
+		if err = rows.Err(); err != nil {
+			return nil, err
+		}
 		var user obj.ProfileDB
 		err = rows.Scan(&user.ID, &user.Username, &user.FollowerCount, &user.FollowingCount, &user.MediaCount)
 		if err != nil {
@@ -67,7 +70,7 @@ func (db *appdbimpl) FetchUsername(username string) ([]obj.ProfileDB, error) {
 		res = append(res, user)
 	}
 	if err = rows.Err(); err != nil {
-		fmt.Print("no rows")
+
 		return nil, err
 	}
 

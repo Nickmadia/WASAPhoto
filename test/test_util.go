@@ -3,7 +3,7 @@ package test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"testing"
@@ -12,7 +12,7 @@ import (
 const BASEURL = "http://localhost:3000/"
 
 func CheckRes(t *testing.T, expected int, resp *http.Response) string {
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != expected {
 		t.Errorf("Expected %d got %d\n ", expected, resp.StatusCode)
 	}

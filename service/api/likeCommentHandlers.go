@@ -132,11 +132,12 @@ func (rt *_router) addComment(w http.ResponseWriter, r *http.Request, ps httprou
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	r.Body.Close()
 	if !isCommentValid(comment.Text) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = rt.db.CommentMedia(auth, postId, comment.Text)
+	commId, err := rt.db.CommentMedia(auth, postId, comment.Text)
 
 	if errors.Is(err, database.ErrResourceDoesNotExist) {
 		w.WriteHeader(http.StatusNotFound)
@@ -157,6 +158,12 @@ func (rt *_router) addComment(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+	err = json.NewEncoder(w).Encode(commId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
 }
 
 func (rt *_router) removeComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

@@ -75,7 +75,7 @@ type AppDatabase interface {
 	UnlikeMedia(idReq uint64, postId uint64) error
 
 	//methods for managing comments
-	CommentMedia(idReq uint64, postId uint64, text string) error
+	CommentMedia(idReq uint64, postId uint64, text string) (int64, error)
 	UncommentMedia(idReq uint64, postId uint64, commentId uint64) error
 
 	//follow

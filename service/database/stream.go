@@ -19,8 +19,14 @@ func (db *appdbimpl) GetStream(idReq uint64) ([]objects.PhotoMetadata, error) {
 	var metadataList []objects.PhotoMetadata
 
 	for raws.Next() {
+		if err = raws.Err(); err != nil {
+			return nil, err
+		}
 		var id uint64
-		raws.Scan(&id)
+		err = raws.Scan(&id)
+		if err != nil {
+			return nil, err
+		}
 		obj, err := db.GetMediaMetadata(idReq, id)
 		if err != nil {
 			return nil, err

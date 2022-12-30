@@ -91,6 +91,7 @@ paths:
           in: query
           description: The username to fetch
           schema:
+            description: the username you want to fetch
             type: string
             example: "abcd1234"
             pattern: "^[a-zA-Z1-9]*$"
@@ -372,6 +373,10 @@ paths:
       responses:
           '201':
             description: Operation successfully handled
+            content:
+              application/json:
+                schema:
+                  $ref : "#/components/schemas/id"
           '400': {$ref: "#/components/responses/BadRequest"}
           '403': {$ref: "#/components/responses/Forbidden"}
           '500': {$ref: "#/components/responses/InternalServerError"}
@@ -449,6 +454,7 @@ paths:
               type: object
               properties:
                 name:
+                  description: the username you are going to choose
                   type: string
                   example: Maria
                   pattern: "^[a-zA-Z1-9]*$"
@@ -539,8 +545,8 @@ components:
           type: string
           description: the timestamp of the comment
           format: date-time
-          pattern: '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/'
-          example: "2018-03-20T09:12:28Z"
+          pattern: '^[1-9]{4}\-[1-9]{2}\-[1-9]{2}T[1-9]{2}:[1-9]{2}:[1-9]{3}Z$'
+          example: "2018-03-20T09:12:281Z"
     photo_metadata:
       description: "object representation of a post"
       type: object
@@ -579,7 +585,8 @@ components:
           type: string
           description: the timestamp of the post
           format: date-time
-          example: "2018-03-20T09:12:28Z"
+          example: "2018-03-20T09:12:281Z"
+          pattern: '^[1-9]{4}\-[1-9]{2}\-[1-9]{2}T[1-9]{2}:[1-9]{2}:[1-9]{3}Z$'
     photo:
       type: string
       format: byte 

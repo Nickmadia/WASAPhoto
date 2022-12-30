@@ -3,7 +3,8 @@ package test
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"io"
+
 	"net/http"
 	"os"
 	"testing"
@@ -33,7 +34,7 @@ func TestGetMedia(t *testing.T) {
 
 	resp := ExecReq(req)
 	//checkRes(t, http.StatusOK, resp)
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	var img []byte
 	img, err := base64.StdEncoding.DecodeString(string(body))
 	if err != nil {

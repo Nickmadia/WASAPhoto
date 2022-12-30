@@ -55,7 +55,13 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	w.Header().Set("content-type", "application/json")
-	_ = json.NewEncoder(w).Encode(*profile)
+	err = json.NewEncoder(w).Encode(*profile)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
+
 }
 
 func (rt *_router) updateUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -85,7 +91,7 @@ func (rt *_router) updateUsername(w http.ResponseWriter, r *http.Request, ps htt
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
+	r.Body.Close()
 	if !isValidUsername(updatedUsername.Text) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -105,7 +111,6 @@ func (rt *_router) updateUsername(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-	defer w.Write([]byte{})
 
 }
 
@@ -137,7 +142,12 @@ func (rt *_router) fetchUsername(w http.ResponseWriter, r *http.Request, ps http
 		apiProfiles[i] = element.FromDatabase()
 	}
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(apiProfiles)
+	err = json.NewEncoder(w).Encode(apiProfiles)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
 }
 
 func (rt *_router) getUserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -180,7 +190,13 @@ func (rt *_router) getUserInfo(w http.ResponseWriter, r *http.Request, ps httpro
 		response.following = append(response.following, element.FromDatabase())
 	}
 	w.Header().Set("content-type", "application/json")
-	_ = json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
+
 }
 
 // helpers
