@@ -30,6 +30,13 @@
 	vertical-align: -0.125em;
 	fill: currentcolor;
 }
+.err {
+	padding: 50%;
+}
+
+.imagecontainer {
+	padding-bottom: 1rem;
+}
 
 /* .nav-scroller {
 	position: relative;

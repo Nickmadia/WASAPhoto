@@ -10,8 +10,14 @@ export default {
 
 
 <template>
-	<sidebar></sidebar>
-
+	<div>
+		<header>
+			 <sidebar> </sidebar>
+		</header>
+		<main>
+			<routerView></routerView>
+		</main>
+	</div>
 
 	
 	

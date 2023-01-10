@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -101,7 +101,8 @@ func (rt *_router) postMedia(w http.ResponseWriter, r *http.Request, ps httprout
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	img, err := ioutil.ReadAll(r.Body)
+	img, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
 	if err != nil {
 		fmt.Print(err)
 		w.WriteHeader(http.StatusBadRequest)

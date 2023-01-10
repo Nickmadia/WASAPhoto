@@ -21,6 +21,7 @@ func CheckRes(t *testing.T, expected int, resp *http.Response) string {
 	} else {
 		fmt.Printf("Body : %s\n", body)
 	}
+	resp.Body.Close()
 	return string(body)
 }
 

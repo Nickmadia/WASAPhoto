@@ -3,7 +3,7 @@
     <nav class="navbar navbar-expand-md navbar-dark bg-dark ">
         <a class="navbar-brand" href="#" >WASAPHOTO</a>
         <button 
-            class="navbar-toggler"
+            class="navbar-toggler "
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#toggleMobileMenu"
@@ -18,10 +18,10 @@
         <div class="collapse navbar-collapse justify-content-end icons " id="toggleMobileMenu" >
             <ul class="navbar-nav text-center ">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#h">Home</a>
+                    <a class="nav-link" href="#">Home</a>
                 </li>
                 <li class="nav-item active">
-                    <a class="nav-link" href="#home">Profile</a>
+                    <a class="nav-link" href="#profile">Profile</a>
                 </li>
                 <li class="nav-item active">
                     <a class="nav-link" href="#home">Logout</a>

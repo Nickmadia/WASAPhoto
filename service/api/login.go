@@ -13,12 +13,17 @@ func (rt *_router) signIn(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	var username objects.Username
 
-	json.NewDecoder(r.Body).Decode(&username)
+	err := json.NewDecoder(r.Body).Decode(&username)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
 	if !isValidUsername(username.Text) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	r.Body.Close()
+	defer r.Body.Close()
 	//in case the username does not exist create a user profile with that username and return the ID
 	id, err := rt.db.SignInOrLogin(username.Text)
 

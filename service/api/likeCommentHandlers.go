@@ -132,7 +132,7 @@ func (rt *_router) addComment(w http.ResponseWriter, r *http.Request, ps httprou
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	r.Body.Close()
+	defer r.Body.Close()
 	if !isCommentValid(comment.Text) {
 		w.WriteHeader(http.StatusBadRequest)
 		return

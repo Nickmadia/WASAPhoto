@@ -91,7 +91,7 @@ func (rt *_router) updateUsername(w http.ResponseWriter, r *http.Request, ps htt
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	r.Body.Close()
+	defer r.Body.Close()
 	if !isValidUsername(updatedUsername.Text) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
