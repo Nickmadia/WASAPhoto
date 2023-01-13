@@ -33,10 +33,14 @@ func TestGetMedia(t *testing.T) {
 	req := GetBaseReq(path, "GET", "", "1")
 
 	resp := ExecReq(req)
-	//checkRes(t, http.StatusOK, resp)
-	body, _ := io.ReadAll(resp.Body)
+	// checkRes(t, http.StatusOK, resp)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Error(err)
+	}
+	defer resp.Body.Close()
 	var img []byte
-	img, err := base64.StdEncoding.DecodeString(string(body))
+	img, err = base64.StdEncoding.DecodeString(string(body))
 	if err != nil {
 		t.Error(err)
 	}

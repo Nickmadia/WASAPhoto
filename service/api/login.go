@@ -34,5 +34,10 @@ func (rt *_router) signIn(w http.ResponseWriter, r *http.Request, ps httprouter.
 	}
 
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(id)
+	err = json.NewEncoder(w).Encode(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
 }

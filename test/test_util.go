@@ -12,7 +12,10 @@ import (
 const BASEURL = "http://localhost:3000/"
 
 func CheckRes(t *testing.T, expected int, resp *http.Response) string {
-	body, _ := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Error(err)
+	}
 	if resp.StatusCode != expected {
 		t.Errorf("Expected %d got %d\n ", expected, resp.StatusCode)
 	}
@@ -21,7 +24,7 @@ func CheckRes(t *testing.T, expected int, resp *http.Response) string {
 	} else {
 		fmt.Printf("Body : %s\n", body)
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
 	return string(body)
 }
 
