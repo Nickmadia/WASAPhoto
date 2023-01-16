@@ -13,11 +13,12 @@ import (
 )
 
 func (rt *_router) likeMedia(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	//check auth
+	defer r.Body.Close()
+	// check auth
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -56,11 +57,12 @@ func (rt *_router) likeMedia(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 func (rt *_router) unlikeMedia(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	//check auth
+	defer r.Body.Close()
+	// check auth
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -167,6 +169,7 @@ func (rt *_router) addComment(w http.ResponseWriter, r *http.Request, ps httprou
 }
 
 func (rt *_router) removeComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	defer r.Body.Close()
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 	if err != nil {
 		//must be authenticated

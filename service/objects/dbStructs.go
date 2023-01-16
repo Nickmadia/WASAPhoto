@@ -1,6 +1,6 @@
 package objects
 
-//Database representation of a profile
+// Database representation of a profile
 type ProfileDB struct {
 	ID             uint64
 	Username       string

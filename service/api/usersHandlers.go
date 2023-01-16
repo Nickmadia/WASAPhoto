@@ -22,6 +22,7 @@ type UserInfo struct {
 }
 
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	defer r.Body.Close()
 
 	id, err := strconv.ParseUint(ps.ByName("user_id"), 10, 64)
 	if err != nil {
@@ -29,26 +30,26 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	//auth checks
-	//TODO remember to encapsulate
+	// auth checks
+	// TODO remember to encapsulate
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	//The db will check in the query if the user is banned
+	// The db will check in the query if the user is banned
 	profile, err := rt.db.GetUserProfile(id, auth)
 
 	if errors.Is(err, database.ErrProfileDoesNotExist) {
-		//profile not found return status 404
+		// profile not found return status 404
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if errors.Is(err, database.ErrUserIsBanned) {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	} else if err != nil {
-		//internal errors raise 500
+		// internal errors raise 500
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)
 		return
@@ -75,7 +76,7 @@ func (rt *_router) updateUsername(w http.ResponseWriter, r *http.Request, ps htt
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -100,11 +101,11 @@ func (rt *_router) updateUsername(w http.ResponseWriter, r *http.Request, ps htt
 	err = rt.db.UpdateUsername(id, updatedUsername.Text)
 
 	if errors.Is(err, database.ErrProfileDoesNotExist) {
-		//profile not found return status 404
+		// profile not found return status 404
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if err != nil {
-		//internal errors raise 500
+		// if internal errors raise 500
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)
 		return
@@ -115,7 +116,7 @@ func (rt *_router) updateUsername(w http.ResponseWriter, r *http.Request, ps htt
 }
 
 func (rt *_router) fetchUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
+	defer r.Body.Close()
 	if !r.URL.Query().Has("username") {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -128,7 +129,7 @@ func (rt *_router) fetchUsername(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	//db returns max 20 profiles, will not include users who have banned the requesters
+	// db returns max 20 profiles, will not include users who have banned the requesters
 	profiles, err := rt.db.FetchUsername(fecthedUsername)
 
 	if err != nil {
@@ -151,32 +152,33 @@ func (rt *_router) fetchUsername(w http.ResponseWriter, r *http.Request, ps http
 }
 
 func (rt *_router) getUserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	defer r.Body.Close()
 	id, err := strconv.ParseUint(ps.ByName("user_id"), 10, 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	//auth checks
+	// auth checks
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	//The db will check in the query if the user is banned
+	// The db will check in the query if the user is banned
 	followers, following, err := rt.db.GetUserInfo(id, auth)
 
 	if errors.Is(err, database.ErrProfileDoesNotExist) {
-		//profile not found return status 404
+		// profile not found return status 404
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if errors.Is(err, database.ErrUserIsBanned) {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	} else if err != nil {
-		//internal errors raise 500
+		// internal errors raise 500
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)
 		return

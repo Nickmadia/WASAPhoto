@@ -11,7 +11,7 @@ import (
 )
 
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
+	defer r.Body.Close()
 	id, err := strconv.ParseUint(ps.ByName("user_id"), 10, 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -21,7 +21,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -57,6 +57,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 }
 
 func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	defer r.Body.Close()
 	id, err := strconv.ParseUint(ps.ByName("user_id"), 10, 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -66,7 +67,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

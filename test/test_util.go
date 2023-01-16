@@ -13,6 +13,7 @@ const BASEURL = "http://localhost:3000/"
 
 func CheckRes(t *testing.T, expected int, resp *http.Response) string {
 	body, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
 	if err != nil {
 		t.Error(err)
 	}
@@ -24,7 +25,6 @@ func CheckRes(t *testing.T, expected int, resp *http.Response) string {
 	} else {
 		fmt.Printf("Body : %s\n", body)
 	}
-	defer resp.Body.Close()
 	return string(body)
 }
 

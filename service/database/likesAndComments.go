@@ -8,7 +8,7 @@ import (
 
 // methods for managing likes
 func (db *appdbimpl) LikeMedia(idReq uint64, postId uint64) error {
-	//TODO check if the user is authenticated + ENCAPS
+	// TODO check if the user is authenticated + ENCAPS
 	var exist uint64
 	query := fmt.Sprintf("SELECT count(*) FROM %s WHERE id=%d", USERSTABLE, idReq)
 	err := db.c.QueryRow(query).Scan(&exist)
@@ -17,7 +17,7 @@ func (db *appdbimpl) LikeMedia(idReq uint64, postId uint64) error {
 	} else if err != nil {
 		return err
 	}
-	//check if the post exist
+	// check if the post exist
 	query = fmt.Sprintf("SELECT count(*) FROM %s WHERE id=%d", MEDIATABLE, postId)
 	err = db.c.QueryRow(query).Scan(&exist)
 	if exist != 1 {
@@ -75,7 +75,7 @@ func (db *appdbimpl) CommentMedia(idReq uint64, postId uint64, text string) (int
 	}
 
 	query = fmt.Sprintf("SELECT count(*) FROM %s WHERE id=%d", MEDIATABLE, postId)
-	//check if the post exist
+	// check if the post exist
 	err = db.c.QueryRow(query).Scan(&exist)
 	if exist != 1 {
 		return 0, ErrResourceDoesNotExist
@@ -83,7 +83,7 @@ func (db *appdbimpl) CommentMedia(idReq uint64, postId uint64, text string) (int
 		return 0, err
 	}
 
-	//Getting the timestamp + adding comment
+	// Getting the timestamp + adding comment
 	ts := time.Now().Unix()
 	query = fmt.Sprintf(`INSERT INTO %s ( owner_id, media_id, text , time_stamp) VALUES (%d, %d, "%s", %d)`,
 		COMMENTSTABLE, idReq, postId, text, ts)
@@ -133,8 +133,8 @@ func (db *appdbimpl) GetComments(idReq uint64, postId uint64) (*[]obj.Comment, e
 		return nil, err
 	}
 
-	//query the result while removing comments from banned users
-	//TODO put everything in one query
+	// query the result while removing comments from banned users
+	// TODO put everything in one query
 	query = fmt.Sprintf(`SELECT id, owner_id, text, time_stamp 
 						FROM %s 
 						WHERE media_id=%d AND owner_id NOT IN 
@@ -154,7 +154,7 @@ func (db *appdbimpl) GetComments(idReq uint64, postId uint64) (*[]obj.Comment, e
 		if err != nil {
 			return nil, err
 		}
-		//TODO encapsulate date time converter in a utils package
+		// TODO encapsulate date time converter in a utils package
 		comment.Timestamp = time.Unix(ts, 0).Format("2006-01-02T15:04:05.999Z")
 		commentsList = append(commentsList, comment)
 	}
@@ -182,7 +182,7 @@ func (db *appdbimpl) GetLikes(idReq uint64, postId uint64) (*[]obj.Profile, erro
 		return nil, ErrResourceDoesNotExist
 	}
 
-	//query the result while removing profiles from banned users
+	// query the result while removing profiles from banned users
 	query = fmt.Sprintf(`SELECT u.id, u.username, u.followers_count, u.following_count, u.media_count 
 						FROM %s AS u 
 						JOIN %s AS l ON u.id = l.user_id
@@ -192,7 +192,7 @@ func (db *appdbimpl) GetLikes(idReq uint64, postId uint64) (*[]obj.Profile, erro
 	if err != nil {
 		return nil, err
 	}
-	//TODO keep an eye on pointed list that could be erased after function calling
+	// TODO keep an eye on pointed list that could be erased after function calling
 	var likesList = new([]obj.Profile)
 	for rows.Next() {
 		if err = rows.Err(); err != nil {

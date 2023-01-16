@@ -17,7 +17,7 @@ func (db *appdbimpl) UploadImage(id uint64, img *string) (uint64, error) {
 	} else if err != nil {
 		return 0, err
 	}
-	//Getting the timestamp
+	// Getting the timestamp
 	ts := time.Now().Unix()
 	query = fmt.Sprintf(`INSERT INTO %s (owner_id, png, time_stamp) VALUES (%d,"%s", %d)`,
 		MEDIATABLE, id, *img, ts)
@@ -33,8 +33,8 @@ func (db *appdbimpl) UploadImage(id uint64, img *string) (uint64, error) {
 	return uint64(upId), nil
 }
 func (db *appdbimpl) GetMedia(idReq uint64, postId uint64) (*string, error) {
-	//TODO user auth
-	//TODO check bans in all the file
+	// TODO user auth
+	// TODO check bans in all the file
 	query := fmt.Sprintf(`SELECT png FROM %s WHERE id=%d`, MEDIATABLE, postId)
 	var b64Img string
 	err := db.c.QueryRow(query).Scan(&b64Img)
@@ -47,7 +47,7 @@ func (db *appdbimpl) GetMedia(idReq uint64, postId uint64) (*string, error) {
 
 }
 func (db *appdbimpl) GetMediaMetadata(idReq uint64, postId uint64) (*objects.PhotoMetadata, error) {
-	//TODO Check if user is auth
+	// TODO Check if user is auth
 	var res = new(objects.PhotoMetadata)
 	var ts int64
 	query := fmt.Sprintf(`SELECT id, owner_id, comments_count, likes_count, time_stamp  FROM %s WHERE id=%d`, MEDIATABLE, postId)
@@ -73,7 +73,7 @@ func (db *appdbimpl) GetMediaMetadata(idReq uint64, postId uint64) (*objects.Pho
 
 }
 func (db *appdbimpl) DeleteMedia(idReq uint64, postId uint64) error {
-	//check allso if the user is the actual owner
+	// check allso if the user is the actual owner
 	query := fmt.Sprintf(`SELECT id FROM %s WHERE id=%d AND owner_id=%d`, MEDIATABLE, postId, idReq)
 	var exist int
 	err := db.c.QueryRow(query).Scan(&exist)

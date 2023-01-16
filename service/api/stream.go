@@ -12,6 +12,7 @@ import (
 )
 
 func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	defer r.Body.Close()
 
 	userId, err := strconv.ParseUint(ps.ByName("user_id"), 10, 64)
 	if err != nil {
@@ -19,10 +20,10 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	//TODO fix the check
+	// TODO fix the check
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -30,7 +31,7 @@ func (rt *_router) getStream(w http.ResponseWriter, r *http.Request, ps httprout
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-	//delegate check to db  wether the user is banned or not
+	// delegate check to db  wether the user is banned or not
 	postList, err := rt.db.GetStream(userId)
 
 	if errors.Is(err, database.ErrUserIsNotAuthenticated) {

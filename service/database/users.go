@@ -7,11 +7,11 @@ import (
 	"fmt"
 )
 
-//TODO Add checks for authentication
+// TODO Add checks for authentication
 
 // Retrives a user profile while checking bans permissions
 func (db *appdbimpl) GetUserProfile(id uint64, idReq uint64) (*obj.ProfileDB, error) {
-	//TODO encapsulate ban check
+	// TODO encapsulate ban check
 	isBanned, err := db.IsBanned(id, idReq)
 	if isBanned {
 		return nil, ErrUserIsBanned
@@ -86,8 +86,8 @@ func (db *appdbimpl) GetUserInfo(id uint64, idReq uint64) ([]obj.ProfileDB, []ob
 	}
 	var followersList, followingList []obj.ProfileDB
 
-	//TODO change limit and change var
-	//following
+	// TODO change limit and change var
+	// following
 	query = fmt.Sprintf("SELECT * FROM %s WHERE id=%d LIMIT %d", FOLLOWERSTABLE, id, FETCHLIMIT)
 	rows, err := db.c.Query(query)
 	if err != nil {
@@ -107,7 +107,7 @@ func (db *appdbimpl) GetUserInfo(id uint64, idReq uint64) ([]obj.ProfileDB, []ob
 	if err = rows.Err(); err != nil {
 		return nil, nil, err
 	}
-	//followers
+	// followers
 	rows, err = db.c.Query("SELECT * FROM ? WHERE follower_id=? LIMIT ?", FOLLOWERSTABLE, id, FETCHLIMIT)
 	if err != nil {
 		return nil, nil, err

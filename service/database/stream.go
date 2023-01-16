@@ -6,9 +6,9 @@ import (
 )
 
 func (db *appdbimpl) GetStream(idReq uint64) ([]objects.PhotoMetadata, error) {
-	//TODO  Enforce a limit and add from date parameter to endpoint in order to retrieve older posts
-	//TODO remember to order by data in reverse
-	//TODO remember to return empty list instead of nil
+	// TODO  Enforce a limit and add from date parameter to endpoint in order to retrieve older posts
+	// TODO remember to order by data in reverse
+	// TODO remember to return empty list instead of nil
 	query := fmt.Sprintf(`SELECT id FROM %s WHERE owner_id IN 
 	( SELECT follow_id FROM %s WHERE id=%d) ORDER BY time_stamp DESC`,
 		MEDIATABLE, FOLLOWERSTABLE, idReq)

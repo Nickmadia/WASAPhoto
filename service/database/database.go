@@ -149,7 +149,7 @@ func execMultipleQuerys(db *sql.DB, s ...string) error {
 
 		if err != nil {
 
-			return fmt.Errorf("error creating database structure: %w", err)
+			return fmt.Errorf("error creating db structurev: %w", err)
 		}
 	}
 	return nil

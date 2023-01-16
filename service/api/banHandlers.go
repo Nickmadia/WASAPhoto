@@ -11,10 +11,11 @@ import (
 )
 
 func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	defer r.Body.Close()
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -34,7 +35,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 	err = rt.db.BanUser(auth, banId)
-	//TODO consider modifiying userIsBannedError
+	// TODO consider modifiying userIsBannedError
 	if errors.Is(err, database.ErrResourceDoesNotExist) {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -53,10 +54,11 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 }
 
 func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	defer r.Body.Close()
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -76,7 +78,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	err = rt.db.UnbanUser(auth, banId)
-	//TODO consider modifiying userIsBannedError
+	// TODO consider modifiying userIsBannedError
 	if errors.Is(err, database.ErrResourceDoesNotExist) {
 		w.WriteHeader(http.StatusNotFound)
 		return

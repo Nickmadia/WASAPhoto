@@ -15,7 +15,7 @@ func (db *appdbimpl) FollowUser(idReq uint64, followedId uint64) error {
 		return err
 	}
 
-	//check if the follow target exist
+	// check if the follow target exist
 	query = fmt.Sprintf("SELECT count(*) FROM %s WHERE id=%d",
 		USERSTABLE, followedId)
 	err = db.c.QueryRow(query).Scan(&exist)
@@ -31,7 +31,7 @@ func (db *appdbimpl) FollowUser(idReq uint64, followedId uint64) error {
 	if isBanned {
 		return ErrUserIsBanned
 	}
-	//check if he already follows
+	// check if he already follows
 	query = fmt.Sprintf("SELECT count(*) FROM %s WHERE id=%d AND follow_id=%d",
 		FOLLOWERSTABLE, idReq, followedId)
 	err = db.c.QueryRow(query).Scan(&exist)
@@ -41,7 +41,7 @@ func (db *appdbimpl) FollowUser(idReq uint64, followedId uint64) error {
 	if exist == 1 {
 		return nil
 	}
-	//TODO ENFORCE PRIMARY KEYS
+	// TODO ENFORCE PRIMARY KEYS
 	query = fmt.Sprintf(`INSERT INTO %s (id, follow_id) VALUES (%d,%d)`,
 		FOLLOWERSTABLE, idReq, followedId)
 	_, err = db.c.Exec(query)

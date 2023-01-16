@@ -5,7 +5,6 @@ import (
 	"WASAPhoto/service/database"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -14,22 +13,22 @@ import (
 )
 
 func (rt *_router) getMedia(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
+	defer r.Body.Close()
 	postId, err := strconv.ParseUint(ps.ByName("post_id"), 10, 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	//check auth
+	// check auth
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	//delegate check to db  wether the user is banned or not
+	// delegate check to db  wether the user is banned or not
 	img, err := rt.db.GetMedia(auth, postId)
 
 	if errors.Is(err, database.ErrProfileDoesNotExist) {
@@ -54,21 +53,22 @@ func (rt *_router) getMedia(w http.ResponseWriter, r *http.Request, ps httproute
 }
 
 func (rt *_router) getMediaMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	defer r.Body.Close()
 	postId, err := strconv.ParseUint(ps.ByName("post_id"), 10, 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	//check auth
+	// check auth
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	//delegate check to db  wether the user is banned or not
+	// delegate check to db  wether the user is banned or not
 	imgMetadata, err := rt.db.GetMediaMetadata(auth, postId)
 
 	if errors.Is(err, database.ErrResourceDoesNotExist) {
@@ -93,18 +93,17 @@ func (rt *_router) getMediaMetadata(w http.ResponseWriter, r *http.Request, ps h
 }
 
 func (rt *_router) postMedia(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	//check auth
+	// check auth
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	img, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		fmt.Print(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -134,16 +133,17 @@ func (rt *_router) postMedia(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 func (rt *_router) deleteMedia(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	defer r.Body.Close()
 	postId, err := strconv.ParseUint(ps.ByName("post_id"), 10, 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	//check auth
+	// check auth
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
