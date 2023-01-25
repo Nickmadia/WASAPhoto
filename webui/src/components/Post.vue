@@ -1,58 +1,111 @@
 <script>
+import Comment from './Comment.vue'
 
 export default {
+    props: ['post'],
+    components:{
+        Comment
+    },
     data() {
         return {
-            likes: 0,
-            
+            commenttest: [ 
+                    {text: 'that is great',username: 'jack',date: '12 dec 2022'},
+                    {text: 'that is great',username: 'jack',date: '12 dec 2022'},
+                    {text: 'that is great',username: 'jack',date: '12 dec 2022'},
+             
+                  
+                ],
+                user :null,
+                img: null
 
         }
-    }
+    },
+    methods : {
+        async getImg() {
+            try {
+                let response = await this.$axios.get('/media/' + this.post.id)
+                this.img = response.data
+                console.log(response.data)
+            } catch (e) {
+
+            }
+        },
+        async getUser() {
+            try {
+                let response = await this.$axios.get('/users/' + this.post.owner_id)
+                this.user = response.data
+                console.log(this.user)
+                
+                
+            } catch (e) {
+
+            }
+        },
+        getReadableDate() {
+            let isodate = this.post.time_stamp
+            var d = new Date(isodate)
+            return d.toLocaleDateString('en-GB')
+        },
+        getb64() {
+            return 'data:image/png;base64,' + this.img
+        }
+    },
+    async mounted() {
+        console.log(this.post)
+        await this.getImg()
+        await this.getUser()
+        
+    },
+    computed : {
+        
+}
 }
 </script>
 <template>
-    <div class="card bg" style="width: 20rem;">
-        <div class="card-body">
-            <h4 class="card-title"> username</h4>
-            <div class="imagecontainer">
-                <img src="./imgdb.jpeg" class="card-img-top" alt="Card image cap" >
+<div v-if="post!=null && user!=null">
+    <div class="card bg-dark border-white " style="width: 40rem; ">
+        <div class="card-body text-white">
+            <div class="d-flex">
+                <h4 class="card-title text-primary "> {{this.user.Username}}</h4>
             </div>
-                <h6 class="card-subtitle text-muted"></h6>
-                <div class="d-flex justify-content-between">
-                    <a class="btn btn-outline-primary " href="javascript:">Like</a>
-                    <span class="border border-primary ">
-                        <p>10 people like this shit</p>
-                    </span>
+            <div class="imagecontainer ">
+                <img :src="'data:image/png;base64,' + this.img" class="card-img-top" alt="Card image cap" >
+            </div>
+            <div class="d-flex border-bottom pb-2">
+                <div class="pb-2 me-2">
+                    <button class="btn btn-primary btn-sm ">Like</button>
                 </div>
-            <div>
-                <div class="row d-flex justify-content-center mt-100 mb-100">
-    <div >
-        <div class="card bg-light">
-            <div class="card-body">
-                <!-- Comment Row -->
-                <div class="d-flex flex-row comment-row m-t-0">
-                    
-                    <div class="comment-text w-100">
-                        <h6 class="font-medium">James Thomas</h6> <span class="m-b-15 d-block">This is awesome website. I would love to comeback again. </span>
-                        <div class="comment-footer d-flex justify-content-between"> 
-                            <span class="text-muted float-right">April 14, 2019</span>  <button type="button" class="btn btn-danger btn-sm">Delete</button>
+                <a class="text-primary me-2 pt-1" href="">
+                    {{this.post.likes_count}} likes
+                </a>
+                <div class="text-primary pt-1">
+                    {{this.post.comments_count}} comments
+                </div>
+                <div class="small text-muted ms-auto pt-1">{{this.getReadableDate()}}</div>
+            </div>
+                <div>
+                    <div class="row d-flex justify-content-center mt-100 mb-100">
+                        <div >
+                                <div class="">
+                                    <Comment v-for="item in commenttest"
+                                            :key="item.id"
+                                            :username="item.username"
+                                            :comment_text="item.text"
+                                            :date="item.date">
+                                            
+                                    </Comment>
+                                </div> 
                         </div>
-                    </div>
-                </div> 
-                
-                
-            </div> 
-        </div>
-    </div>
-</div>
+                </div>
             </div>
         
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Comment" aria-label="Comment" aria-describedby="basic-addon2">
+            <div class="input-group mb-3 pt-3">
+                <input type="text" class="form-control bg-dark border-white" placeholder="Comment" aria-label="Comment" aria-describedby="basic-addon2">
                 <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button">Comment</button>
+                    <button class="btn btn-outline-secondary border-white " type="button">Comment</button>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </template>

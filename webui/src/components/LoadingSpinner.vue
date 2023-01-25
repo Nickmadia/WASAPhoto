@@ -11,8 +11,8 @@ export default {
 				<span class="visually-hidden">Loading...</span>
 			</div>
 		</div>
-	</div>
 	<div v-if="!loading"><slot /></div>
+	</div>
 </template>
 
 <style></style>

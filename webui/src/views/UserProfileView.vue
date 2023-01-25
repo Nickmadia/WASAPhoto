@@ -1,42 +1,32 @@
 <script>
-import Post from '../components/Post.vue'
 
 export default {
-  components: { Post },
-  props: ['username', 'userId'],
-	data() {
+  props:['extUser','userId'],
+    data () {
         return {
-            posts: ['',''],
-            show: false,
-            postN: 0,
-            followerN: 4,
-            followingN:0
-
+          isFollowing:null
         }
-    },
-    methods: {
-      async getProfile() {
-        try {
-          
-
-          const config = {
-              headers: { Authorization: `${this.userId}`,}}
-
-          let response = await this.$axios.get('/users/' + this.userId, config)
-          this.postN = response.data.MediaCount
-          this.followerN = response.data.FollowerCount
-          this.followingN = response.datta.FollowingCount
-
-        } catch(e) {
-
-        }
-      }
     },
     mounted() {
-      this.getProfile()
+        
+    },
+    methods: {
+		async followUser(){
+			try {
+				console.log('stuff')
+        console.log(this.userId)
+				let response = await this.$axios.put("/users/" + this.userId +"/follow/" + this.extUser.user_id)
+				console.log(response.data)
+			} 
+			catch (e){
+
+			}
+		}
     }
 }
 </script>
+
+
 <template>
     <section class="h-100 d-flex justify-content-center bg-dark">
   <div class="container py-4 h-100">
@@ -46,23 +36,23 @@ export default {
          
           <div class="p-4 d-flex text-black" style="background-color: #f8f9fa;">
             <div class="ms-4  " >
-              <h5>{{this.username}}</h5>
-              <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
+              <h5>{{this.extUser.username}}</h5>
+              <button type="button" @click="followUser" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
                 style="z-index: 1;">
-                Edit profile
+                Follow
               </button>
             </div>
             <div class="d-flex ms-auto text-center py-1">
               <div>
-                <p class="mb-1 h5">{{this.postN}}</p>
+                <p class="mb-1 h5">{{this.extUser.media_count}}</p>
                 <p class="small text-muted mb-0">Photos</p>
               </div>
               <div class="px-3">
-                <p class="mb-1 h5">{{this.followerN}}</p>
+                <p class="mb-1 h5">{{this.extUser.followers_count}}</p>
                 <p class="small text-muted mb-0">Followers</p>
               </div>
               <div>
-                <p class="mb-1 h5">{{this.followingN}}</p>
+                <p class="mb-1 h5">{{this.extUser.following_count}}</p>
                 <p class="small text-muted mb-0">Following</p>
               </div>
             </div>

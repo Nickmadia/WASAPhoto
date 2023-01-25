@@ -48,6 +48,20 @@ func (db *appdbimpl) FollowUser(idReq uint64, followedId uint64) error {
 	if err != nil {
 		return err
 	}
+
+	// update followers number
+	query = fmt.Sprintf(`UPDATE %s SET followers_count = followers_count + 1 WHERE id=%d `,
+		USERSTABLE, followedId)
+	_, err = db.c.Exec(query)
+	if err != nil {
+		return err
+	}
+	query = fmt.Sprintf(`UPDATE %s SET following_count = following_count + 1 WHERE id=%d `,
+		USERSTABLE, idReq)
+	_, err = db.c.Exec(query)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 func (db *appdbimpl) UnfollowUser(idReq uint64, followedId uint64) error {
@@ -73,6 +87,18 @@ func (db *appdbimpl) UnfollowUser(idReq uint64, followedId uint64) error {
 		return err
 	} else if affected == 0 {
 		return ErrResourceDoesNotExist
+	}
+	query = fmt.Sprintf(`UPDATE %s SET followers_count = followers_count - 1 WHERE id=%d `,
+		USERSTABLE, followedId)
+	_, err = db.c.Exec(query)
+	if err != nil {
+		return err
+	}
+	query = fmt.Sprintf(`UPDATE %s SET following_count = following_count - 1 WHERE id=%d `,
+		USERSTABLE, idReq)
+	_, err = db.c.Exec(query)
+	if err != nil {
+		return err
 	}
 	return nil
 }
