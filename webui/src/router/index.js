@@ -6,12 +6,14 @@ import osProfile from '../views/UserProfileView.vue'
 const router = createRouter({
 	history: createWebHashHistory(import.meta.env.BASE_URL),
 	routes: [
-		{path: '/login', component: Login}, 
+		{path: '/login', name:'login', component: Login}, 
 		{path: '/', name:'home', component: HomeView},
 		{path: '/:username' , name:'extProfile' ,component: osProfile},
 		{path:'/profile', name:'profile', component: Profile},
 		{path: '/some/:id/link', component: HomeView},
 	]
 })
+
+
 
 export default router

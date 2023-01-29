@@ -28,7 +28,7 @@ export default {
 
 
 <template>
-    <section class="h-100 d-flex justify-content-center bg-dark">
+    <section class="h-100 d-flex justify-content-center bg-black pt-5">
   <div class="container py-4 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col col-lg-9 col-xl-7">

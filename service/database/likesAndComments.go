@@ -171,7 +171,27 @@ func (db *appdbimpl) GetComments(idReq uint64, postId uint64) (*[]obj.Comment, e
 	return &commentsList, nil
 
 }
+func (db *appdbimpl) HasLike(idReq uint64, postId uint64) (bool, error) {
+	var exist int
+	query := fmt.Sprintf("SELECT count(*) FROM %s WHERE id=%d", MEDIATABLE, postId)
+	err := db.c.QueryRow(query).Scan(&exist)
+	if err != nil {
+		return false, err
+	} else if exist != 1 {
+		return false, ErrResourceDoesNotExist
+	}
 
+	query = fmt.Sprintf("Select count(*) FROM %s WHERE user_id=%d AND media_id=%d",
+		LIKESTABLE, idReq, postId)
+	err = db.c.QueryRow(query).Scan(&exist)
+	if err != nil {
+		return false, err
+	}
+	if exist != 1 {
+		return false, nil
+	}
+	return true, nil
+}
 func (db *appdbimpl) GetLikes(idReq uint64, postId uint64) (*[]obj.Profile, error) {
 	var exist int
 	query := fmt.Sprintf("SELECT count(*) FROM %s WHERE id=%d", MEDIATABLE, postId)

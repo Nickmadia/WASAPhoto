@@ -32,13 +32,20 @@ export default {
 			this.currentExtUser = user
 			this.$router.push({name:'extProfile', params:{ username: user.username}})
 		}
+	},
+	mounted() {
+		this.$router.beforeEach(async (to, from) => {
+			if(!this.isLogged && to.name !== 'login'){
+				return {name: 'login'}
+			}
+		})
 	}
 }
 </script>
 
 
 <template>
-	<div>
+	<div class="bg-black">
 		<header>
 			 <navbar :userId="this.userId" v-if="isLogged" @logout="doLogout" @redirect="this.redirectToProfile"> </navbar>
 		</header>

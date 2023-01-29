@@ -33,15 +33,16 @@ export default {
 </script>
 
 <template>
-	<div>
-		<div class="d-flex justify-content-center bg-dark text-white py-3" >
+	<div class="py-5 section">
+		<div v-if="this.posts.length>0" class="d-flex justify-content-center bg-black text-white py-3" >
 			<div >{{this.username}} {{this.userId}}
 				<div v-for="post in posts"
 					:key="post.id">
-					<Post :post="post" class="row py-2"></Post>
+					<Post :post="post" :userId="this.userId" class="row py-2"></Post>
 				</div>
 			</div>
 		</div>
+		<div v-else class="py-5 text-white bg-black  text-center">nothing to show</div>
 		
 		<!-- Modal -->
 			

@@ -9,12 +9,10 @@ type ProfileDB struct {
 	MediaCount     uint64
 }
 type PhotoMetadataDB struct {
-	ID            uint64
-	OwnerId       uint64
-	CommentsCount uint
-	Comments      []uint64
-	LikesCount    uint
-	Likes         []Profile
+	ID       uint64
+	OwnerId  uint64
+	Comments []uint64
+	Likes    []Profile
 }
 
 func (p *ProfileDB) FromDatabase() Profile {

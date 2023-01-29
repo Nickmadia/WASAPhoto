@@ -126,7 +126,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		bansTbl := `CREATE TABLE bans (id INTEGER NOT NULL, ban_id INTEGER NOT NULL, PRIMARY KEY(id, ban_id))`
 
 		mediaTbl := `CREATE TABLE media (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, owner_id INTEGER NOT NULL, 
-				likes_count INTEGER NOT NULL DEFAULT 0, comments_count INTEGER NOT NULL DEFAULT 0, png TEXT NOT NULL, time_stamp INTEGER NOT NULL)`
+				, png TEXT NOT NULL, time_stamp INTEGER NOT NULL)`
 
 		err := execMultipleQuerys(db, userTblStmt, followersTbl, commentsTbl, likesTbl, bansTbl, mediaTbl)
 		if err != nil {

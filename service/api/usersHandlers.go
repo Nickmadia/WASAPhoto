@@ -56,7 +56,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	w.Header().Set("content-type", "application/json")
-	err = json.NewEncoder(w).Encode(*profile)
+	err = json.NewEncoder(w).Encode(profile.FromDatabase())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)

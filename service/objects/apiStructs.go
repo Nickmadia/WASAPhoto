@@ -27,13 +27,11 @@ type Identifier struct {
 	ID uint64 `json:"identifier"`
 }
 type PhotoMetadata struct {
-	ID            uint64    `json:"id"`
-	OwnerId       uint64    `json:"owner_id"`
-	CommentsCount uint      `json:"comments_count"`
-	Comments      []Comment `json:"comments"`
-	LikesCount    uint      `json:"likes_count"`
-	Likes         []Profile `json:"likes"`
-	Timestamp     string    `json:"time_stamp"`
+	ID        uint64    `json:"id"`
+	OwnerId   uint64    `json:"owner_id"`
+	Comments  []Comment `json:"comments"`
+	Likes     []Profile `json:"likes"`
+	Timestamp string    `json:"time_stamp"`
 }
 
 func (p *Profile) ToDatabase() ProfileDB {

@@ -50,9 +50,9 @@ func (db *appdbimpl) GetMediaMetadata(idReq uint64, postId uint64) (*objects.Pho
 	// TODO Check if user is auth
 	var res = new(objects.PhotoMetadata)
 	var ts int64
-	query := fmt.Sprintf(`SELECT id, owner_id, comments_count, likes_count, time_stamp  FROM %s WHERE id=%d`, MEDIATABLE, postId)
+	query := fmt.Sprintf(`SELECT id, owner_id, time_stamp  FROM %s WHERE id=%d`, MEDIATABLE, postId)
 	err := db.c.QueryRow(query).
-		Scan(&res.ID, &res.OwnerId, &res.CommentsCount, &res.LikesCount, &ts)
+		Scan(&res.ID, &res.OwnerId, &ts)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrResourceDoesNotExist
 	} else if err != nil {

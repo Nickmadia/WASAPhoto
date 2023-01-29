@@ -46,8 +46,8 @@ export default {
 
 
 <template>
-    
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark ">
+    <div>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
         <a class="navbar-brand" href="#" >WASAPHOTO</a>
         <button 
             class="navbar-toggler "
@@ -81,10 +81,10 @@ export default {
                 
             </ul>
         </div>
+    </nav>
         <fetchwin :userId="this.userId" :userList="this.userList" @goOnProfile="redirect"></fetchwin>
         <uploadWindow > </uploadWindow>
-    </nav>
-    
+    </div>
 </template>
 
 <style>
