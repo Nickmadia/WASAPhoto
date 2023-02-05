@@ -17,8 +17,8 @@ const USERNAMEREX = "^[a-zA-Z1-9]*$"
 const MAXUSERNAMELENGTH = 16
 
 type UserInfo struct {
-	followers []objects.Profile
-	following []objects.Profile
+	Followers []objects.Profile `json:"followers"`
+	Following []objects.Profile `json:"following"`
 }
 
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -186,10 +186,10 @@ func (rt *_router) getUserInfo(w http.ResponseWriter, r *http.Request, ps httpro
 
 	response := new(UserInfo)
 	for _, element := range followers {
-		response.followers = append(response.followers, element.FromDatabase())
+		response.Followers = append(response.Followers, element.FromDatabase())
 	}
 	for _, element := range following {
-		response.following = append(response.following, element.FromDatabase())
+		response.Following = append(response.Following, element.FromDatabase())
 	}
 	w.Header().Set("content-type", "application/json")
 	err = json.NewEncoder(w).Encode(response)

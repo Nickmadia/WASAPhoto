@@ -21,11 +21,10 @@ export default {
 
           const config = {
               headers: { Authorization: `${this.userId}`,}}
-
           let response = await this.$axios.get('/users/' + this.userId, config)
-          this.postN = response.data.MediaCount
-          this.followerN = response.data.FollowerCount
-          this.followingN = response.datta.FollowingCount
+          this.postN = response.data.media_count
+          this.followerN = response.data.followers_count
+          this.followingN = response.datta.following_count
 
         } catch(e) {
 
@@ -46,13 +45,13 @@ export default {
          
           <div class="p-4 d-flex text-black" style="background-color: #f8f9fa;">
             <div class="ms-4  " >
-              <h5>{{this.username}}</h5>
+              <h4 class="">{{this.username}}</h4>
               <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
                 style="z-index: 1;">
                 Edit profile
               </button>
             </div>
-            <div class="d-flex ms-auto text-center py-1">
+            <div class="d-flex ms-auto text-center mt-3">
               <div>
                 <p class="mb-1 h5">{{this.postN}}</p>
                 <p class="small text-muted mb-0">Photos</p>

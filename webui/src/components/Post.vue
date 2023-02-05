@@ -29,7 +29,6 @@ export default {
             try {
                 let response = await this.$axios.get('/media/' + this.post.id)
                 this.img = response.data
-                console.log(response.data)
             } catch (e) {
 
             }
@@ -38,7 +37,7 @@ export default {
             try {
                 let response = await this.$axios.get('/users/' + this.post.owner_id)
                 this.user = response.data
-                console.log(this.user)
+                
                 
                 
             } catch (e) {
@@ -58,7 +57,7 @@ export default {
             if(!this.liked){
                 let res = await this.$axios.put('/media/' + this.post.id +'/likes/' + this.userId)
                 this.likes_count += 1
-                console.log(res)
+                
             } else {
                 let res = await this.$axios.delete('/media/' + this.post.id +'/likes/' + this.userId)
                 this.likes_count -= 1
@@ -94,14 +93,14 @@ export default {
                 let body = { 'comment_text': this.current_comment}
                 try {
                     let res = await this.$axios.post('/media/'+ this.post.id+ '/comments/comment/'+ this.userId, body)
-                    console.log(res.data)
+                    
                 } catch (e) {
 
                 }
             }
         }
     },
-    async mounted() {
+    async beforeMount() {
         console.log(this.post)
         await this.getImg()
         await this.getUser()

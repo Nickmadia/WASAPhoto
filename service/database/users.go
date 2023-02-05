@@ -79,16 +79,17 @@ func (db *appdbimpl) FetchUsername(username string) ([]obj.ProfileDB, error) {
 
 // Returns a list of followers or/and following users of the given profile
 func (db *appdbimpl) GetUserInfo(id uint64, idReq uint64) ([]obj.ProfileDB, []obj.ProfileDB, error) {
+	var exist int
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id=%d AND ban_id=%d", BANSTABLE, id, idReq)
-	err := db.c.QueryRow(query).Scan()
-	if errors.Is(err, sql.ErrNoRows) {
+	err := db.c.QueryRow(query).Scan(&exist)
+	if !errors.Is(err, sql.ErrNoRows) {
 		return nil, nil, ErrUserIsBanned
 	}
 	var followersList, followingList []obj.ProfileDB
 
 	// TODO change limit and change var
 	// following
-	query = fmt.Sprintf("SELECT * FROM %s WHERE id=%d LIMIT %d", FOLLOWERSTABLE, id, FETCHLIMIT)
+	query = fmt.Sprintf("SELECT * FROM %s WHERE id=(SELECT follow_id FROM %s WHERE id=%d LIMIT %d)", USERSTABLE, FOLLOWERSTABLE, id, FETCHLIMIT)
 	rows, err := db.c.Query(query)
 	if err != nil {
 		return nil, nil, err
@@ -108,7 +109,8 @@ func (db *appdbimpl) GetUserInfo(id uint64, idReq uint64) ([]obj.ProfileDB, []ob
 		return nil, nil, err
 	}
 	// followers
-	rows, err = db.c.Query("SELECT * FROM ? WHERE follower_id=? LIMIT ?", FOLLOWERSTABLE, id, FETCHLIMIT)
+	query = fmt.Sprintf("SELECT * FROM %s WHERE id = (SELECT id FROM %s WHERE follow_id=%d LIMIT %d)", USERSTABLE, FOLLOWERSTABLE, id, FETCHLIMIT)
+	rows, err = db.c.Query(query)
 	if err != nil {
 		return nil, nil, err
 	}

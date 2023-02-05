@@ -4,7 +4,10 @@ export default {
   props:['extUser','userId'],
     data () {
         return {
-          isFollowing:null
+          isFollowing:false,
+          followerList: [],
+          followingList: [],
+
         }
     },
     mounted() {
@@ -12,16 +15,54 @@ export default {
     },
     methods: {
 		async followUser(){
-			try {
-				console.log('stuff')
-        console.log(this.userId)
-				let response = await this.$axios.put("/users/" + this.userId +"/follow/" + this.extUser.user_id)
-				console.log(response.data)
+      if (this.isFollowing)
+      {
+        try {
+        let response = await this.$axios.delete("/users/" + this.userId +"/follow/" + this.extUser.user_id)
+				//reactive follow button, check if already folloews from followers list, update followers
 			} 
 			catch (e){
+        
+        }
+      } else {
+          try {
+        let response = await this.$axios.put("/users/" + this.userId +"/follow/" + this.extUser.user_id)
+				//reactive follow button, check if already folloews from followers list, update followers
+			} 
+			catch (e){
+        
+        }
+      }
+			
+      this.isFollowing = !this.isFollowing
+		},
+    async getProfileInfo() {
+      try {
+        let response = await this.$axios.get("/users/" + this.extUser.user_id + "/info")
+        if (response.data.followers != null) {
+          this.followerList = response.data.followers 
+        }
+        if (response.data.following != null) {
 
-			}
-		}
+          this.followingList = response.data.following 
+        }
+        console.log(response)
+      } catch(e) {
+
+      }
+    },
+    checkFollow() {
+      for (let user of this.followerList) {
+        if(user.user_id == this.userId) {
+          return true
+        }
+      }
+        return false
+    }
+    },
+    async beforeMount() {
+      await this.getProfileInfo()
+      this.isFollowing = this.checkFollow()
     }
 }
 </script>
@@ -37,9 +78,13 @@ export default {
           <div class="p-4 d-flex text-black" style="background-color: #f8f9fa;">
             <div class="ms-4  " >
               <h5>{{this.extUser.username}}</h5>
-              <button type="button" @click="followUser" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
+              <button v-if="!this.isFollowing" type="button" @click="followUser" class="btn btn-outline-dark " data-mdb-ripple-color="dark"
                 style="z-index: 1;">
                 Follow
+              </button>
+              <button v-else type="button" @click="followUser" class="btn btn-outline-dark btn-secondary" data-mdb-ripple-color="dark"
+                style="z-index: 1;">
+                Unfollow
               </button>
             </div>
             <div class="d-flex ms-auto text-center py-1">

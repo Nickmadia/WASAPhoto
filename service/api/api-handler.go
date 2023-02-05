@@ -27,13 +27,13 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/users/:user_id/banned/:ban_id", rt.wrap(rt.unbanUser))
 
 	//LikesEndPoints
-	rt.router.PUT("/media/:post_id/likes/:user_id", rt.wrap(rt.likeMedia))
-	rt.router.DELETE("/media/:post_id/likes/:user_id", rt.wrap(rt.unlikeMedia))
+	rt.router.PUT("/posts/:post_id/likes/:user_id", rt.wrap(rt.likeMedia))
+	rt.router.DELETE("/posts/:post_id/likes/:user_id", rt.wrap(rt.unlikeMedia))
 	// TODO change likes/like into likes/:user_id, also consider removing user id from path
 
 	//Comments
-	rt.router.POST("/media/:post_id/comments/comment/:user_id", rt.wrap(rt.addComment))
-	rt.router.DELETE("/media/:post_id/comments/delete/:comment_id", rt.wrap(rt.removeComment))
+	rt.router.POST("/posts/:post_id/comments/comment/:user_id", rt.wrap(rt.addComment))
+	rt.router.DELETE("/posts/:post_id/comments/delete/:comment_id", rt.wrap(rt.removeComment))
 
 	//Stream
 	rt.router.GET("/feed/:user_id", rt.wrap(rt.getStream))

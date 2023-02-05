@@ -113,7 +113,7 @@ paths:
         '500': {$ref: "#/components/responses/InternalServerError"}   
         
   #the user id is taken from the auth`s header
-  /media/:
+  /media:
     post:
       security:
         - bearerAuth: []
@@ -139,7 +139,7 @@ paths:
         '400': {$ref: "#/components/responses/BadRequest"}
         '403': {$ref: "#/components/responses/Forbidden"}
         '500': {$ref: "#/components/responses/InternalServerError"} 
-  /media/{post_id}/info/:
+  /media/{post_id}/info:
     get:
       security:
         - bearerAuth: []
@@ -160,7 +160,7 @@ paths:
         '403': {$ref: "#/components/responses/Forbidden"}
         '404': {$ref: "#/components/responses/NotFound"}
         '500': {$ref: "#/components/responses/InternalServerError"}   
-  /media/{post_id}/:
+  /media/{post_id}:
     parameters:
       - $ref: "#/components/parameters/post_id"
     get:
@@ -312,7 +312,7 @@ paths:
         '404': {$ref: "#/components/responses/NotFound"}
         '500': {$ref: "#/components/responses/InternalServerError"}
         
-  /{post_id}/likes/{user_id}:
+  /posts/{post_id}/likes/{user_id}:
     parameters: 
     - $ref: "#/components/parameters/post_id"
     - $ref: "#/components/parameters/user_id"
@@ -343,7 +343,7 @@ paths:
           '403': {$ref: "#/components/responses/Forbidden"}
           '404': {$ref: "#/components/responses/NotFound"}
           '500': {$ref: "#/components/responses/InternalServerError"}  
-  /{post_id}/comments/comment/{user_id}:
+  /posts/{post_id}/comments/comment/{user_id}:
     post:
       security:
         - bearerAuth: []
@@ -380,7 +380,7 @@ paths:
           '400': {$ref: "#/components/responses/BadRequest"}
           '403': {$ref: "#/components/responses/Forbidden"}
           '500': {$ref: "#/components/responses/InternalServerError"}
-  /{post_id}/comments/delete/{comment_id}:
+  /posts/{post_id}/comments/delete/{comment_id}:
     delete:
       security:
           - bearerAuth: []
