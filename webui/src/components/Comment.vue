@@ -1,6 +1,6 @@
 <script>
     export default {
-    props: ['comment_text', 'username', 'date'],
+    props: ['comment_id','comment_text', 'username', 'date', 'owner'],
     
 
 }

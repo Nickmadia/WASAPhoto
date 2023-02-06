@@ -159,7 +159,7 @@ func (rt *_router) addComment(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(commId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

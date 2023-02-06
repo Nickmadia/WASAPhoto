@@ -69,11 +69,13 @@ export default {
             }
         },
         hasLike() {
+            if (this.post.likes != null) {
             for( let el of this.post.likes ){
                 if(el.user_id == this.userId)
                 {
                     this.liked = true
                 }
+            }
             }
         },
         getLikesCount() {
@@ -92,7 +94,12 @@ export default {
             if(this.current_comment!= '') {
                 let body = { 'comment_text': this.current_comment}
                 try {
-                    let res = await this.$axios.post('/media/'+ this.post.id+ '/comments/comment/'+ this.userId, body)
+                    let res = await this.$axios.post('/posts/'+ this.post.id+ '/comments/comment/'+ this.userId, body)
+                    if (res.status == 204) {
+                        this.post.comments.push({"comment_id":1,"owener_id":3,"owner_username":"nic","comment_text":this.current_comment,"time_stamp":"2023-02-05T21:38:07Z"})
+                        this.current_comment = ""
+                        //check owner in backend
+                    }
                     
                 } catch (e) {
 
@@ -146,7 +153,6 @@ export default {
                                             :username="item.owner_username"
                                             :comment_text="item.comment_text"
                                             :date="getReadableDate(item.time_stamp)">
-                                            
                                     </Comment>
                                 </div> 
                         </div>
