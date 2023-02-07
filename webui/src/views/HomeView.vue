@@ -18,11 +18,22 @@ export default {
 
 	},
 	methods: {
+		async deletePost(post_id){
+			try {
+				let response = await this.$axios.delete('/media/'+ post_id)
+				this.posts = this.posts.filter(x => x.id!= post_id) 
+			} catch(e)
+			{
+
+			}
+      },
 		async refreshPosts() {
 			try {
 				let response = await this.$axios.get('/feed/' + this.userId)
+				if(response.data != null) {
 				this.posts = response.data
-				console.log(response.data)
+				}
+				
 			}
 			catch(e){
 
@@ -38,7 +49,7 @@ export default {
 			<div >{{this.username}} {{this.userId}}
 				<div v-for="post in posts"
 					:key="post.id">
-					<Post :post="post" :userId="this.userId" class="row py-2"></Post>
+					<Post :post="post" :userId="this.userId" :userName="this.username" @delPost="deletePost" class="row py-2"></Post>
 				</div>
 			</div>
 		</div>

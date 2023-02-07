@@ -23,6 +23,7 @@ export default {
                 let response = await this.$axios.post('/session', body)
                   console.log(response.data)
                 this.redirectProfile(response.data.identifier)
+                //I set the auth header here!!!!!
                 this.$axios.defaults.headers.common['Authorization'] = `${response.data.identifier}`;
             } catch(e) {
               //errors

@@ -2,19 +2,12 @@
 import Comment from './Comment.vue'
 
 export default {
-    props: ['post', 'userId'],
+    props: ['post', 'userId', 'userName'],
     components:{
         Comment
     },
     data() {
         return {
-            commenttest: [ 
-                    {text: 'that is great',username: 'jack',date: '12 dec 2022'},
-                    {text: 'that is great',username: 'jack',date: '12 dec 2022'},
-                    {text: 'that is great',username: 'jack',date: '12 dec 2022'},
-             
-                  
-                ],
                 user :null,
                 img: null,
                 liked: false,
@@ -44,10 +37,14 @@ export default {
 
             }
         },
-        getReadableDate() {
-            let isodate = this.post.time_stamp
-            var d = new Date(isodate)
-            return d.toLocaleDateString('en-GB')
+        getReadableDate(date) {
+            var d = new Date(date)
+            return d.toDateString() + ' ' + d.toLocaleTimeString()
+        },
+        getCurrentDate() {
+            var d = new Date()
+            
+            return d.toDateString() + ' ' + d.toLocaleTimeString()
         },
         getb64() {
             return 'data:image/png;base64,' + this.img
@@ -55,11 +52,11 @@ export default {
         async like(){
             try {
             if(!this.liked){
-                let res = await this.$axios.put('/media/' + this.post.id +'/likes/' + this.userId)
+                let res = await this.$axios.put('/posts/' + this.post.id +'/likes/' + this.userId)
                 this.likes_count += 1
                 
             } else {
-                let res = await this.$axios.delete('/media/' + this.post.id +'/likes/' + this.userId)
+                let res = await this.$axios.delete('/posts/' + this.post.id +'/likes/' + this.userId)
                 this.likes_count -= 1
             }
             this.liked = !this.liked
@@ -94,10 +91,16 @@ export default {
             if(this.current_comment!= '') {
                 let body = { 'comment_text': this.current_comment}
                 try {
-                    let res = await this.$axios.post('/posts/'+ this.post.id+ '/comments/comment/'+ this.userId, body)
-                    if (res.status == 204) {
-                        this.post.comments.push({"comment_id":1,"owener_id":3,"owner_username":"nic","comment_text":this.current_comment,"time_stamp":"2023-02-05T21:38:07Z"})
+                    let res = await this.$axios.post('/posts/'+ this.post.id+ '/comments/'+ this.userId, body)
+                    if (res.status == 201) {
+                        if (this.post.comments != null) {
+                            this.post.comments.push({"comment_id":res.data,"owner_id":this.userId,"owner_username":this.userName,"comment_text":this.current_comment,"time_stamp":this.getCurrentDate()})
+                        } else {
+                            this.post.comments = [{"comment_id":res.data,"owner_id":this.userId,"owner_username":this.userName,"comment_text":this.current_comment,"time_stamp":this.getCurrentDate()}]
+                        }
+                        this.comments_count++
                         this.current_comment = ""
+
                         //check owner in backend
                     }
                     
@@ -105,10 +108,25 @@ export default {
 
                 }
             }
+        }, async uncommentPost(id) {  
+            try {
+                let res = await this.$axios.delete('/posts/'+ this.post.id+ '/comments/comment/'+ id)
+                if (res.status == 204) {
+                    
+                    this.post.comments = this.post.comments.filter(x => x.comment_id != id)
+                }
+                this.comments_count--
+            } catch (e) {
+
+            }
+            
+        },
+        isOwner(id) {
+            return id == this.userId
         }
     },
     async beforeMount() {
-        console.log(this.post)
+        
         await this.getImg()
         await this.getUser()
         this.getLikesCount()
@@ -125,8 +143,9 @@ export default {
 <div v-if="post!=null && user!=null">
     <div class="card bg-black border-white " style="width: 50rem; ">
         <div class="card-body text-white">
-            <div class="d-flex">
-                <h4 class="card-title text-primary fw-bold"> {{this.user.username}}</h4>
+            <div class="d-flex mb-1">
+                <h4 class="card-title text-primary fw-bold "> {{this.user.username}}</h4>
+                <button v-if="this.post.owner_id == this.userId" @click="$emit('delPost', this.post.id)" class="ms-auto btn btn-balck btn-sm btn-outline-danger ">delete</button>
             </div>
             <div class="imagecontainer ">
                 <img :src="'data:image/png;base64,' + this.img" class="card-img-top" alt="Card image cap" >
@@ -134,7 +153,7 @@ export default {
             <div class="d-flex border-bottom pb-2">
                 <div class="pb-2 me-2">
                     <button v-if="!this.liked" class="btn btn-primary btn-sm " @click="like">Like</button>
-                    <button v-else class="btn btn-secondary btn-sm " @click="like">Like</button>
+                    <button v-else class="btn btn-black btn-outline-secondary text-white btn-sm " @click="like">Like</button>
                 </div>
                 <a class="text-primary me-2 pt-1" href="">
                     {{this.likes_count}} likes
@@ -142,7 +161,7 @@ export default {
                 <div class="text-primary pt-1">
                     {{this.comments_count}} comments
                 </div>
-                <div class="small text-muted ms-auto pt-1">{{this.getReadableDate()}}</div>
+                <div class="small text-muted ms-auto pt-1">{{this.getReadableDate(this.post.time_stamp)}}</div>
             </div>
                 <div>
                     <div class="row d-flex justify-content-center mt-100 mb-100">
@@ -150,9 +169,12 @@ export default {
                                 <div class="">
                                     <Comment v-for="item in post.comments"
                                             :key="item.comment_id"
+                                            :comment_id="item.comment_id"
                                             :username="item.owner_username"
                                             :comment_text="item.comment_text"
-                                            :date="getReadableDate(item.time_stamp)">
+                                            :owner="this.isOwner(item.owner_id)"
+                                            :date="this.getReadableDate(item.time_stamp)"
+                                            @removeComment="uncommentPost">
                                     </Comment>
                                 </div> 
                         </div>

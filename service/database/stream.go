@@ -10,8 +10,8 @@ func (db *appdbimpl) GetStream(idReq uint64) ([]objects.PhotoMetadata, error) {
 	// TODO remember to order by data in reverse
 	// TODO remember to return empty list instead of nil
 	query := fmt.Sprintf(`SELECT id FROM %s WHERE owner_id IN 
-	( SELECT follow_id FROM %s WHERE id=%d) ORDER BY time_stamp DESC`,
-		MEDIATABLE, FOLLOWERSTABLE, idReq)
+	( SELECT follow_id FROM %s WHERE id=%d) or owner_id=%d ORDER BY time_stamp DESC`,
+		MEDIATABLE, FOLLOWERSTABLE, idReq, idReq)
 	raws, err := db.c.Query(query)
 	if err != nil {
 		return nil, err

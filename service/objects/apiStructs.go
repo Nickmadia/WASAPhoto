@@ -14,7 +14,7 @@ type CommentPlain struct {
 }
 type Comment struct {
 	ID        uint64 `json:"comment_id"`
-	OwnerId   uint64 `json:"owener_id"`
+	OwnerId   uint64 `json:"owner_id"`
 	Username  string `json:"owner_username"`
 	Text      string `json:"comment_text"`
 	Timestamp string `json:"time_stamp"`

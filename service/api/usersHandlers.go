@@ -17,8 +17,10 @@ const USERNAMEREX = "^[a-zA-Z1-9]*$"
 const MAXUSERNAMELENGTH = 16
 
 type UserInfo struct {
-	Followers []objects.Profile `json:"followers"`
-	Following []objects.Profile `json:"following"`
+	Followers []objects.Profile       `json:"followers"`
+	Following []objects.Profile       `json:"following"`
+	Posts     []objects.PhotoMetadata `json:"posts"`
+	IsBanned  bool                    `json:"is_banned"`
 }
 
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -128,9 +130,15 @@ func (rt *_router) fetchUsername(w http.ResponseWriter, r *http.Request, ps http
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
+	if err != nil {
+		// must be authenticated
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 	// db returns max 20 profiles, will not include users who have banned the requesters
-	profiles, err := rt.db.FetchUsername(fecthedUsername)
+	profiles, err := rt.db.FetchUsername(fecthedUsername, auth)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -183,8 +191,29 @@ func (rt *_router) getUserInfo(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Error(err)
 		return
 	}
-
+	posts, err := rt.db.GetUserPosts(id, auth)
+	if errors.Is(err, database.ErrProfileDoesNotExist) {
+		// profile not found return status 404
+		w.WriteHeader(http.StatusNotFound)
+		return
+	} else if errors.Is(err, database.ErrUserIsBanned) {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	} else if err != nil {
+		// internal errors raise 500
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
+	isBanned, err := rt.db.IsBanned(auth, id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
 	response := new(UserInfo)
+	response.IsBanned = isBanned
+	response.Posts = posts
 	for _, element := range followers {
 		response.Followers = append(response.Followers, element.FromDatabase())
 	}

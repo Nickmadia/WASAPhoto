@@ -1,22 +1,20 @@
 package database
 
 import (
-	"database/sql"
-	"errors"
 	"fmt"
 )
 
 func (db *appdbimpl) IsBanned(id uint64, banId uint64) (bool, error) {
-	query := fmt.Sprintf("SELECT * FROM %s WHERE id=%d AND ban_id=%d",
+	query := fmt.Sprintf("SELECT count(*) FROM %s WHERE id=%d AND ban_id=%d",
 		BANSTABLE, id, banId)
 	var exist int
 	err := db.c.QueryRow(query).Scan(&exist)
-	if errors.Is(err, sql.ErrNoRows) {
-		return false, nil
-	} else if err != nil {
+	if err != nil {
 		return false, err
+	} else if exist != 0 {
+		return true, nil
 	}
-	return true, nil
+	return false, nil
 }
 
 // TODO implement removing the user from the followers

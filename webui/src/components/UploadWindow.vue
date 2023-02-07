@@ -29,7 +29,7 @@ export default {
             for (var i =0; i< u8.length ; i++){
                 bin += String.fromCharCode(u8[i])
             }
-                console.log('wtf')
+                
             return window.btoa(bin)
         }
     },

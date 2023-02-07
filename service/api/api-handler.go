@@ -32,7 +32,7 @@ func (rt *_router) Handler() http.Handler {
 	// TODO change likes/like into likes/:user_id, also consider removing user id from path
 
 	// Comments
-	rt.router.POST("/posts/:post_id/comments/:user_id", rt.wrap(rt.addComment))
+	rt.router.POST("/posts/:post_id/comments/comment/:user_id", rt.wrap(rt.addComment))
 	rt.router.DELETE("/posts/:post_id/comments/:comment_id", rt.wrap(rt.removeComment))
 
 	// Stream

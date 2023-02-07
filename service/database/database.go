@@ -61,8 +61,9 @@ type AppDatabase interface {
 	//Methods for managing the users
 	GetUserProfile(id uint64, idReq uint64) (*objects.ProfileDB, error)
 	UpdateUsername(id uint64, username string) error
-	FetchUsername(username string) ([]objects.ProfileDB, error)
+	FetchUsername(username string, auth uint64) ([]objects.ProfileDB, error)
 	GetUserInfo(id uint64, idReq uint64) ([]objects.ProfileDB, []objects.ProfileDB, error)
+	GetUserPosts(id uint64, idReq uint64) ([]objects.PhotoMetadata, error)
 
 	//Methods for managing media uploads and downloads
 	UploadImage(id uint64, img *string) (uint64, error)

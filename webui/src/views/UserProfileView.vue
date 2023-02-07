@@ -1,12 +1,15 @@
 <script>
-
+import Post from '../components/Post.vue'
 export default {
-  props:['extUser','userId'],
+  components: {Post},
+  props:['extUser','userId', 'username'],
     data () {
         return {
           isFollowing:false,
           followerList: [],
           followingList: [],
+          posts:[],
+          isBanned: false
 
         }
     },
@@ -14,11 +17,12 @@ export default {
         
     },
     methods: {
-		async followUser(){
-      if (this.isFollowing)
+      async ban() {
+      
+      if (this.isBanned)
       {
         try {
-        let response = await this.$axios.delete("/users/" + this.userId +"/follow/" + this.extUser.user_id)
+        let response = await this.$axios.delete("/users/" + this.userId +"/bans/" + this.extUser.user_id)
 				//reactive follow button, check if already folloews from followers list, update followers
 			} 
 			catch (e){
@@ -26,7 +30,29 @@ export default {
         }
       } else {
           try {
-        let response = await this.$axios.put("/users/" + this.userId +"/follow/" + this.extUser.user_id)
+        let response = await this.$axios.put("/users/" + this.userId +"/bans/" + this.extUser.user_id)
+				//reactive follow button, check if already folloews from followers list, update followers
+			} 
+			catch (e){
+        
+        }
+      }
+			
+      this.isBanned = !this.isBanned
+    },
+		async followUser(){
+      if (this.isFollowing)
+      {
+        try {
+        let response = await this.$axios.delete("/users/" + this.userId +"/follows/" + this.extUser.user_id)
+				//reactive follow button, check if already folloews from followers list, update followers
+			} 
+			catch (e){
+        
+        }
+      } else {
+          try {
+        let response = await this.$axios.put("/users/" + this.userId +"/follows/" + this.extUser.user_id)
 				//reactive follow button, check if already folloews from followers list, update followers
 			} 
 			catch (e){
@@ -46,7 +72,11 @@ export default {
 
           this.followingList = response.data.following 
         }
-        console.log(response)
+        if (response.data.posts != null) {
+          this.posts = response.data.posts
+        }
+        this.isBanned = response.data.is_banned
+        
       } catch(e) {
 
       }
@@ -54,9 +84,11 @@ export default {
     checkFollow() {
       for (let user of this.followerList) {
         if(user.user_id == this.userId) {
+
           return true
         }
       }
+        console.log(this.followerList)
         return false
     }
     },
@@ -69,68 +101,64 @@ export default {
 
 
 <template>
-    <section class="h-100 d-flex justify-content-center bg-black pt-5">
+    <section class="h-100 d-flex justify-content-center bg-black pt-5 ">
   <div class="container py-4 h-100">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col col-lg-9 col-xl-7">
-        <div class="card">
+    <div class="row d-flex justify-content-center  h-100">
+      <div class="col col-lg-3 col-xl-8">
+        <div class="border-bottom">
          
-          <div class="p-4 d-flex text-black" style="background-color: #f8f9fa;">
+          <div class="p-2 my-2 d-flex text-white bg-black" style="background-color: #f8f9fa;">
             <div class="ms-4  " >
-              <h5>{{this.extUser.username}}</h5>
-              <button v-if="!this.isFollowing" type="button" @click="followUser" class="btn btn-outline-dark " data-mdb-ripple-color="dark"
-                style="z-index: 1;">
-                Follow
-              </button>
-              <button v-else type="button" @click="followUser" class="btn btn-outline-dark btn-secondary" data-mdb-ripple-color="dark"
-                style="z-index: 1;">
-                Unfollow
-              </button>
+              <h2 class="text-primary fw-bold">{{this.extUser.username}}</h2>
+              
+              <div class="d-flex ">
+                <div>
+                  <button v-if="!this.isFollowing" type="button" @click="followUser" class="btn  btn-primary " data-mdb-ripple-color="dark"
+                    style="z-index: 1;">
+                    Follow
+                  </button>
+                  <button v-else type="button" @click="followUser" class="btn btn-outline-secondary btn-black text-white" data-mdb-ripple-color="dark"
+                    style="z-index: 1;">
+                    Unfollow
+                  </button>
+                </div>
+                <div class="">
+                  <button v-if="!this.isBanned" type="button" @click="ban" class=" btn btn-outline-secondary text-white btn-danger " 
+                    style="z-index: 1;">
+                    Ban
+                  </button>
+                  <button v-else type="button" @click="ban" class="btn btn-outline-secondary text-white  " 
+                    style="z-index: 1;">
+                    Unban
+                  </button>
+                </div>
+              </div>
             </div>
             <div class="d-flex ms-auto text-center py-1">
               <div>
-                <p class="mb-1 h5">{{this.extUser.media_count}}</p>
+                <p class="mb-1 h5">{{this.posts.length}}</p>
                 <p class="small text-muted mb-0">Photos</p>
               </div>
               <div class="px-3">
-                <p class="mb-1 h5">{{this.extUser.followers_count}}</p>
+                <p class="mb-1 h5">{{this.followerList.lenght}}</p>
                 <p class="small text-muted mb-0">Followers</p>
               </div>
               <div>
-                <p class="mb-1 h5">{{this.extUser.following_count}}</p>
+                <p class="mb-1 h5">{{this.followingList.lenght}}</p>
                 <p class="small text-muted mb-0">Following</p>
               </div>
             </div>
             
           </div>
-          <div class="card-body p-4 text-black">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <p class="lead fw-normal mb-0">Recent photos</p>
-              <p class="mb-0"><a href="#!" class="text-muted">Show all</a></p>
-            </div>
-            <div class="row g-2">
-              <div class="col mb-2">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(112).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-              <div class="col mb-2">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(107).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(108).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-              <div class="col">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(114).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-            </div>
-          </div>
+           
         </div>
+            <div class="d-flex mt-2 justify-content-center card-body py-2 bg-black">
+              <div class="">
+                <div v-for="item in posts" :key="item" class="my-4">
+                  <Post :post="item" :userId="this.userId" :userName="this.username"></Post>
+                </div>
+              </div>
+            </div>
       </div>
     </div>
   </div>

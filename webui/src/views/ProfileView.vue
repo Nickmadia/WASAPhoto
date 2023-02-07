@@ -1,102 +1,134 @@
 <script>
 import Post from '../components/Post.vue'
-
 export default {
-  components: { Post },
-  props: ['username', 'userId'],
-	data() {
+  components: {Post},
+  props:['userId', 'username'],
+    data () {
         return {
-            posts: ['',''],
-            show: false,
-            postN: 0,
-            followerN: 4,
-            followingN:0
-
+          followerList: [],
+          followingList: [],
+          posts:[],
+          currentUsername:'',
+          usernameVar:''
         }
     },
     methods: {
-      async getProfile() {
-        try {
-          
-
-          const config = {
-              headers: { Authorization: `${this.userId}`,}}
-          let response = await this.$axios.get('/users/' + this.userId, config)
-          this.postN = response.data.media_count
-          this.followerN = response.data.followers_count
-          this.followingN = response.datta.following_count
+      async changeUsername() {
+        try{
+          let body = {username:this.currentUsername}
+          console.log(body)
+          let response = await this.$axios.put('/users/' + this.userId + '/username', body)
+          if (response.status == 204) {
+            this.usernameVar = this.currentUsername
+          }
+          this.currentUsername =''
 
         } catch(e) {
 
         }
+      },
+      async getProfileInfo() {
+        try {
+          let response = await this.$axios.get("/users/" + this.userId + "/info")
+          if (response.data.followers != null) {
+            this.followerList = response.data.followers 
+          }
+          if (response.data.following != null) {
+
+            this.followingList = response.data.following 
+          }
+          if (response.data.posts != null) {
+            this.posts = response.data.posts
+          }
+          
+        } catch(e) {
+
+        }
+      },async deletePost(post_id){
+        try {
+          let response = await this.$axios.delete('/media/'+ post_id)
+          this.posts = this.posts.filter(x => x.id!= post_id) 
+        } catch(e)
+        {
+
+        }
       }
     },
-    mounted() {
-      this.getProfile()
+    async beforeMount() {
+      await this.getProfileInfo()
+      this.usernameVar = this.username
     }
 }
 </script>
+
+
 <template>
-    <section class="h-100 d-flex justify-content-center bg-black py-5 mt-4">
+    <section class="h-100 d-flex justify-content-center bg-black pt-5 ">
   <div class="container py-4 h-100">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col col-lg-9 col-xl-7">
-        <div class="card">
+    <div class="row d-flex justify-content-center  h-100">
+      <div class="col col-lg-3 col-xl-8">
+        <div class="border-bottom">
          
-          <div class="p-4 d-flex text-black" style="background-color: #f8f9fa;">
+          <div class="p-2 my-2 d-flex text-white bg-black" style="background-color: #f8f9fa;">
             <div class="ms-4  " >
-              <h4 class="">{{this.username}}</h4>
-              <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
-                style="z-index: 1;">
-                Edit profile
-              </button>
+              <h2 class="text-primary fw-bold">{{this.usernameVar}}</h2>
+              
+              <div class="d-flex ">
+                <div>
+                  <button  type="button"  class="btn  btn-primary " data-mdb-ripple-color="dark"
+                    style="z-index: 1;" data-bs-toggle="modal" data-bs-target="#changeUsernameWindow">
+                    Edit Profile
+                  </button>
+                  
+                </div>
+              </div>
             </div>
-            <div class="d-flex ms-auto text-center mt-3">
+            <div class="d-flex ms-auto text-center py-1">
               <div>
-                <p class="mb-1 h5">{{this.postN}}</p>
+                <p class="mb-1 h5">{{this.posts.length}}</p>
                 <p class="small text-muted mb-0">Photos</p>
               </div>
               <div class="px-3">
-                <p class="mb-1 h5">{{this.followerN}}</p>
+                <p class="mb-1 h5">{{this.followerList.length}}</p>
                 <p class="small text-muted mb-0">Followers</p>
               </div>
               <div>
-                <p class="mb-1 h5">{{this.followingN}}</p>
+                <p class="mb-1 h5">{{this.followingList.length}}</p>
                 <p class="small text-muted mb-0">Following</p>
               </div>
             </div>
             
           </div>
-          <div class="card-body p-4 text-black">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <p class="lead fw-normal mb-0">Recent photos</p>
-              <p class="mb-0"><a href="#!" class="text-muted">Show all</a></p>
-            </div>
-            <div class="row g-2">
-              <div class="col mb-2">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(112).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-              <div class="col mb-2">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(107).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(108).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-              <div class="col">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(114).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-            </div>
-          </div>
+           
         </div>
+            <div class="d-flex mt-2 justify-content-center card-body py-2 bg-black">
+              <div class="">
+                <div v-for="item in posts" :key="item" class="my-4">
+                  <Post :post="item" :userId="this.userId" :userName="this.username" @delPost="deletePost"></Post>
+                </div>
+              </div>
+            </div>
       </div>
     </div>
   </div>
+  <div class="modal fade" id="changeUsernameWindow" tabindex="-1" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title " >Edit Username</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div class="row d-flex justify-content-center align-items-center ">
+                                <div class="d-flex">
+								    <input class="form-control" type="text" placeholder="Username" v-model="currentUsername">
+                                    <button class="btn btn-primary ms-auto " data-bs-dismiss="modal" @click="this.changeUsername">Edit</button>
+                                </div>
+							</div>
+						</div>
+					
+					</div>
+				</div>
+			</div>
 </section>
 </template>
