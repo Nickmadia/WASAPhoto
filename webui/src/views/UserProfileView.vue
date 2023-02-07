@@ -140,11 +140,11 @@ export default {
                 <p class="small text-muted mb-0">Photos</p>
               </div>
               <div class="px-3">
-                <p class="mb-1 h5">{{this.followerList.lenght}}</p>
+                <p class="mb-1 h5">{{this.followerList.length}}</p>
                 <p class="small text-muted mb-0">Followers</p>
               </div>
               <div>
-                <p class="mb-1 h5">{{this.followingList.lenght}}</p>
+                <p class="mb-1 h5">{{this.followingList.length}}</p>
                 <p class="small text-muted mb-0">Following</p>
               </div>
             </div>

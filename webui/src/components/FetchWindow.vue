@@ -11,7 +11,7 @@ export default {
   },
   computed: {
 	removeMyId(){
-		console.log(this.userId)
+		
 		return this.userList.filter(n => n.user_id != this.userId)
 	}
   }
