@@ -58,43 +58,43 @@ const FETCHLIMIT = 20
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	//Methods for managing the users
+	// Methods for managing the users
 	GetUserProfile(id uint64, idReq uint64) (*objects.ProfileDB, error)
 	UpdateUsername(id uint64, username string) error
 	FetchUsername(username string, auth uint64) ([]objects.ProfileDB, error)
 	GetUserInfo(id uint64, idReq uint64) ([]objects.ProfileDB, []objects.ProfileDB, error)
 	GetUserPosts(id uint64, idReq uint64) ([]objects.PhotoMetadata, error)
 
-	//Methods for managing media uploads and downloads
+	// Methods for managing media uploads and downloads
 	UploadImage(id uint64, img *string) (uint64, error)
 	GetMedia(idReq uint64, postId uint64) (*string, error)
 	GetMediaMetadata(idReq uint64, postId uint64) (*objects.PhotoMetadata, error)
 	DeleteMedia(idReq uint64, postId uint64) error
 
-	//methods for managing likes
+	// methods for managing likes
 	LikeMedia(idReq uint64, postId uint64) error
 	UnlikeMedia(idReq uint64, postId uint64) error
 
-	//methods for managing comments
+	// methods for managing comments
 	CommentMedia(idReq uint64, postId uint64, text string) (int64, error)
 	UncommentMedia(idReq uint64, postId uint64, commentId uint64) error
 
-	//follow
+	// follow
 	FollowUser(idReq uint64, followedId uint64) error
 	UnfollowUser(idReq uint64, followedId uint64) error
 
-	//bans
+	// bans
 	IsBanned(id uint64, idBanner uint64) (bool, error)
 	BanUser(idReq uint64, banId uint64) error
 	UnbanUser(idReq uint64, banId uint64) error
 
-	//Login
+	// Login
 	SignInOrLogin(username string) (objects.Identifier, error)
 
-	//Stream
+	// Stream
 	GetStream(idReq uint64) ([]objects.PhotoMetadata, error)
 
-	//ping
+	// ping
 	Ping() error
 }
 
@@ -110,7 +110,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	}
 
 	// Check if table exists. If not, the database is empty, and we need to create the structure
-	//TODO drop prebad written table
+
 	var tableName string
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {

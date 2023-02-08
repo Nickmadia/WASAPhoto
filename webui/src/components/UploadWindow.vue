@@ -11,6 +11,7 @@ export default {
                     var body = this.convertToBase64(this.img);   
               
                     const response = await this.$axios.post('/media',body)
+                   this.$emit('reload')
                   
                 })
                 reader.readAsArrayBuffer(file)

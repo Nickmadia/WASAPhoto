@@ -1,10 +1,10 @@
 <script>
 import Post from '../components/Post.vue'
-import FetchWindow from '../components/FetchWindow.vue'
-import UserItemVue from '../components/UserItem.vue'
+
+
 export default {
 	props: ['username', 'userId'],
-  components: { Post , FetchWindow},
+  components: { Post },
 	data () {
 		return {
 			posts: [],

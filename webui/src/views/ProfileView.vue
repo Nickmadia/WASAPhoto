@@ -20,9 +20,10 @@ export default {
           let response = await this.$axios.put('/users/' + this.userId + '/username', body)
           if (response.status == 204) {
             this.usernameVar = this.currentUsername
+            this.$emit('changeUsername', this.usernameVar)
           }
           this.currentUsername =''
-
+          this.getProfileInfo()
         } catch(e) {
 
         }

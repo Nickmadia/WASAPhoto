@@ -105,10 +105,10 @@ func (rt *_router) unlikeMedia(w http.ResponseWriter, r *http.Request, ps httpro
 }
 
 func (rt *_router) addComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	//check auth
+	// check auth
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -172,7 +172,7 @@ func (rt *_router) removeComment(w http.ResponseWriter, r *http.Request, ps http
 	defer r.Body.Close()
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 	if err != nil {
-		//must be authenticated
+		// must be authenticated
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

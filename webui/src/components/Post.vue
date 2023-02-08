@@ -13,14 +13,15 @@ export default {
                 liked: false,
                 likes_count: 0,
                 comments_count:0,
-                current_comment: ""
+                current_comment: "",
+                Post: null
 
         }
     },
     methods : {
         async getImg() {
             try {
-                let response = await this.$axios.get('/media/' + this.post.id)
+                let response = await this.$axios.get('/media/' + this.Post.id)
                 this.img = response.data
             } catch (e) {
 
@@ -52,11 +53,11 @@ export default {
         async like(){
             try {
             if(!this.liked){
-                let res = await this.$axios.put('/posts/' + this.post.id +'/likes/' + this.userId)
+                let res = await this.$axios.put('/posts/' + this.Post.id +'/likes/' + this.userId)
                 this.likes_count += 1
                 
             } else {
-                let res = await this.$axios.delete('/posts/' + this.post.id +'/likes/' + this.userId)
+                let res = await this.$axios.delete('/posts/' + this.Post.id +'/likes/' + this.userId)
                 this.likes_count -= 1
             }
             this.liked = !this.liked
@@ -66,8 +67,8 @@ export default {
             }
         },
         hasLike() {
-            if (this.post.likes != null) {
-            for( let el of this.post.likes ){
+            if (this.Post.likes != null) {
+            for( let el of this.Post.likes ){
                 if(el.user_id == this.userId)
                 {
                     this.liked = true
@@ -76,14 +77,14 @@ export default {
             }
         },
         getLikesCount() {
-            if (this.post.likes != null) {
-                this.likes_count = this.post.likes.length
+            if (this.Post.likes != null) {
+                this.likes_count = this.Post.likes.length
             }
         
         },
         getCommentsCount() {
-            if (this.post.comments != null) {
-                this.comments_count = this.post.comments.length
+            if (this.Post.comments != null) {
+                this.comments_count = this.Post.comments.length
             }
             
         },
@@ -91,12 +92,12 @@ export default {
             if(this.current_comment!= '') {
                 let body = { 'comment_text': this.current_comment}
                 try {
-                    let res = await this.$axios.post('/posts/'+ this.post.id+ '/comments/'+ this.userId, body)
+                    let res = await this.$axios.post('/posts/'+ this.Post.id+ '/comments/comment/'+ this.userId, body)
                     if (res.status == 201) {
-                        if (this.post.comments != null) {
-                            this.post.comments.push({"comment_id":res.data,"owner_id":this.userId,"owner_username":this.userName,"comment_text":this.current_comment,"time_stamp":this.getCurrentDate()})
+                        if (this.Post.comments != null) {
+                            this.Post.comments.push({"comment_id":res.data,"owner_id":this.userId,"owner_username":this.userName,"comment_text":this.current_comment,"time_stamp":this.getCurrentDate()})
                         } else {
-                            this.post.comments = [{"comment_id":res.data,"owner_id":this.userId,"owner_username":this.userName,"comment_text":this.current_comment,"time_stamp":this.getCurrentDate()}]
+                            this.Post.comments = [{"comment_id":res.data,"owner_id":this.userId,"owner_username":this.userName,"comment_text":this.current_comment,"time_stamp":this.getCurrentDate()}]
                         }
                         this.comments_count++
                         this.current_comment = ""
@@ -110,10 +111,10 @@ export default {
             }
         }, async uncommentPost(id) {  
             try {
-                let res = await this.$axios.delete('/posts/'+ this.post.id+ '/comments/comment/'+ id)
+                let res = await this.$axios.delete('/posts/'+ this.Post.id+ '/comments/'+ id)
                 if (res.status == 204) {
                     
-                    this.post.comments = this.post.comments.filter(x => x.comment_id != id)
+                    this.Post.comments = this.Post.comments.filter(x => x.comment_id != id)
                 }
                 this.comments_count--
             } catch (e) {
@@ -126,12 +127,16 @@ export default {
         }
     },
     async beforeMount() {
-        
+        this.Post = this.post
         await this.getImg()
         await this.getUser()
         this.getLikesCount()
         this.getCommentsCount()
         this.hasLike()
+        
+        
+    },
+    mounted(){
         
     },
     computed : {
@@ -140,12 +145,12 @@ export default {
 }
 </script>
 <template>
-<div v-if="post!=null && user!=null">
+<div v-if="Post!=null && user!=null">
     <div class="card bg-black border-white " style="width: 50rem; ">
         <div class="card-body text-white">
             <div class="d-flex mb-1">
                 <h4 class="card-title text-primary fw-bold "> {{this.user.username}}</h4>
-                <button v-if="this.post.owner_id == this.userId" @click="$emit('delPost', this.post.id)" class="ms-auto btn btn-balck btn-sm btn-outline-danger ">delete</button>
+                <button v-if="this.Post.owner_id == this.userId" @click="$emit('delPost', this.Post.id)" class="ms-auto btn btn-balck btn-sm btn-outline-danger ">delete</button>
             </div>
             <div class="imagecontainer ">
                 <img :src="'data:image/png;base64,' + this.img" class="card-img-top" alt="Card image cap" >
@@ -161,13 +166,13 @@ export default {
                 <div class="text-primary pt-1">
                     {{this.comments_count}} comments
                 </div>
-                <div class="small text-muted ms-auto pt-1">{{this.getReadableDate(this.post.time_stamp)}}</div>
+                <div class="small text-muted ms-auto pt-1">{{this.getReadableDate(this.Post.time_stamp)}}</div>
             </div>
                 <div>
                     <div class="row d-flex justify-content-center mt-100 mb-100">
                         <div >
                                 <div class="">
-                                    <Comment v-for="item in post.comments"
+                                    <Comment v-for="item in Post.comments"
                                             :key="item.comment_id"
                                             :comment_id="item.comment_id"
                                             :username="item.owner_username"

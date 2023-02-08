@@ -31,6 +31,10 @@ export default {
 		redirectToProfile(user){
 			this.currentExtUser = user
 			this.$router.push({name:'extProfile', params:{ username: user.username}})
+		},
+		changeUsername(uname) {
+			this.username = uname
+			console.log("changed")
 		}
 	},
 	mounted() {
@@ -52,7 +56,7 @@ export default {
 
 		<main>
 			<routerView :username="this.username" :extUser="currentExtUser" :userId="this.userId" @login="Login"  
-						@getUsername="getUsername" ></routerView>
+						@getUsername="getUsername" @changeUsername="this.changeUsername"></routerView>
 		</main>
 	</div>
 
