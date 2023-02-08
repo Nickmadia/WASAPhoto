@@ -11,7 +11,7 @@ export default {
                     var body = this.convertToBase64(this.img);   
               
                     const response = await this.$axios.post('/media',body)
-                   this.$emit('reload')
+                    this.$emit('reload')
                   
                 })
                 reader.readAsArrayBuffer(file)
@@ -55,7 +55,7 @@ export default {
 							<div class="row d-flex justify-content-center align-items-center ">
                                 <div class="d-flex">
 								    <input class="from-control" accepts=".png .jpg .jpeg" type="file" ref="file" >
-                                    <button class="btn btn-primary ms-auto " data-bs-dismiss="modal" @click="upload">post</button>
+                                    <button class="btn btn-primary ms-auto " data-bs-dismiss="modal"  @click="upload">post</button>
                                 </div>
 							</div>
 						</div>

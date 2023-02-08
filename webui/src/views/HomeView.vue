@@ -46,7 +46,7 @@ export default {
 <template>
 	<div class="py-5 section">
 		<div v-if="this.posts.length>0" class="d-flex justify-content-center bg-black text-white py-3" >
-			<div >{{this.username}} {{this.userId}}
+			<div >
 				<div v-for="post in posts"
 					:key="post.id">
 					<Post :post="post" :userId="this.userId" :userName="this.username" @delPost="deletePost" class="row py-2"></Post>

@@ -23,7 +23,7 @@ export default {
             this.$emit('changeUsername', this.usernameVar)
           }
           this.currentUsername =''
-          this.getProfileInfo()
+          await this.getProfileInfo()
         } catch(e) {
 
         }

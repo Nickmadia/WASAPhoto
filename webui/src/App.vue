@@ -11,7 +11,8 @@ export default {
 			username: '',
 			userId: '',
 			isLogged: false,
-			currentExtUser: null
+			currentExtUser: null,
+			load: true
 
 		}
 	},
@@ -34,7 +35,12 @@ export default {
 		},
 		changeUsername(uname) {
 			this.username = uname
-			console.log("changed")
+			
+			
+		},
+		loadHome(){
+			console.log('rest')
+			this.load = !this.load
 		}
 	},
 	mounted() {
@@ -51,12 +57,12 @@ export default {
 <template>
 	<div class="bg-black">
 		<header>
-			 <navbar :userId="this.userId" v-if="isLogged" @logout="doLogout" @redirect="this.redirectToProfile"> </navbar>
+			 <navbar :userId="this.userId" v-if="isLogged" @logout="doLogout" @redirect="this.redirectToProfile" @reloadHome="this.loadHome"> </navbar>
 		</header>
 
 		<main>
-			<routerView :username="this.username" :extUser="currentExtUser" :userId="this.userId" @login="Login"  
-						@getUsername="getUsername" @changeUsername="this.changeUsername"></routerView>
+			<routerView :key="this.load" :username="this.username" :extUser="currentExtUser" :userId="this.userId" @login="Login"  
+						@getUsername="getUsername" @changeUsername="this.changeUsername" ></routerView>
 		</main>
 	</div>
 

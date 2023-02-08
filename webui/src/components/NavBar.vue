@@ -83,7 +83,7 @@ export default {
         </div>
     </nav>
         <fetchwin :userId="this.userId" :userList="this.userList" @goOnProfile="redirect"></fetchwin>
-        <uploadWindow > </uploadWindow>
+        <uploadWindow @reload="this.$emit('reloadHome')" > </uploadWindow>
     </div>
 </template>
 
