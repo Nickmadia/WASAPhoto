@@ -14,7 +14,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// mediaEndPoints
 	rt.router.POST("/media", rt.wrap(rt.postMedia))
-	rt.router.GET("/media/:post_id/info", rt.wrap(rt.getMediaMetadata))
+
 	rt.router.GET("/media/:post_id", rt.wrap(rt.getMedia))
 	rt.router.DELETE("/media/:post_id", rt.wrap(rt.deleteMedia))
 

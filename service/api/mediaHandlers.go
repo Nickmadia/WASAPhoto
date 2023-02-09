@@ -52,46 +52,6 @@ func (rt *_router) getMedia(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 }
 
-func (rt *_router) getMediaMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	defer r.Body.Close()
-	postId, err := strconv.ParseUint(ps.ByName("post_id"), 10, 64)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// check auth
-	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
-	if err != nil {
-		// must be authenticated
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	// delegate check to db  wether the user is banned or not
-	imgMetadata, err := rt.db.GetMediaMetadata(auth, postId)
-
-	if errors.Is(err, database.ErrResourceDoesNotExist) {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	} else if errors.Is(err, database.ErrUserIsBanned) {
-		w.WriteHeader(http.StatusForbidden)
-		return
-	} else if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error(err)
-		return
-	}
-
-	w.Header().Set("content-type", "application/json")
-	err = json.NewEncoder(w).Encode(*imgMetadata)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error(err)
-		return
-	}
-}
-
 func (rt *_router) postMedia(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// check auth
 	auth, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)

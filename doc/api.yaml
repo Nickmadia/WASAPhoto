@@ -139,27 +139,6 @@ paths:
         '400': {$ref: "#/components/responses/BadRequest"}
         '403': {$ref: "#/components/responses/Forbidden"}
         '500': {$ref: "#/components/responses/InternalServerError"} 
-  /media/{post_id}/info:
-    get:
-      security:
-        - bearerAuth: []
-      tags: ["Media"]
-      summary: returns the photo metadata
-      description: |-
-        returns the photo metadata
-      operationId: getPhotoMetadata
-      parameters:
-        - $ref: "#/components/parameters/post_id"
-      responses:
-        '200':
-            description: "The photo's metadata such as : number of likes, comments and id"
-            content: 
-              application/json:
-                schema: {$ref: "#/components/schemas/photo_metadata"}
-        '400': {$ref: "#/components/responses/BadRequest"}
-        '403': {$ref: "#/components/responses/Forbidden"}
-        '404': {$ref: "#/components/responses/NotFound"}
-        '500': {$ref: "#/components/responses/InternalServerError"}   
   /media/{post_id}:
     parameters:
       - $ref: "#/components/parameters/post_id"
